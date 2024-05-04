@@ -1,0 +1,4 @@
+repository "BirdManAR@BirdManAR@cloud"
+  path "/"
+    br "/main"
+    co "/main"
