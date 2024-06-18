@@ -8,7 +8,7 @@ public class Timer : MonoBehaviour
 {
     public Text timerText;
     private float timer = 0f;
-    private float clearTime = 120f;
+    private float clearTime = 60f;
     public BirdControl BirdControl;
     public GameObject LongHand;
     public GameObject ShortHand;

@@ -19,5 +19,15 @@ public class Title : MonoBehaviour
                 
             }
         }
+        // マウスクリックでシーンを変更
+        var mouse = Mouse.current;
+        if (mouse != null)
+        {
+            if (mouse.leftButton.wasPressedThisFrame)
+            {
+                // "Game"という名前のシーンに移動
+                SceneManager.LoadScene("Game");
+            }
+        }
     }
 }
