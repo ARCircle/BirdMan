@@ -19,11 +19,11 @@ public class Title : MonoBehaviour
                 
             }
         }
-        // マウスクリックでシーンを変更
-        var mouse = Mouse.current;
-        if (mouse != null)
+        // タッチまたはマウスクリックでシーンを変更
+        var pointer = Pointer.current;
+        if (pointer != null)
         {
-            if (mouse.leftButton.wasPressedThisFrame)
+            if (pointer.press.wasPressedThisFrame)
             {
                 // "Game"という名前のシーンに移動
                 SceneManager.LoadScene("Game");
