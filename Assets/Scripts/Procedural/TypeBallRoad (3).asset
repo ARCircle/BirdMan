@@ -1,0 +1,153 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad4271a85288d804fb4aa0e917064f99, type: 3}
+  m_Name: TypeBallRoad (3)
+  m_EditorClassIdentifier: 
+  objectName: 
+  walkParameters:
+    delta: 2.18
+    forwardOffset: 0.52
+    noise: 0.01
+    seed: 48
+    sphereScale: 0.2
+    maxDistanceThreshold: 0.95
+    lerpSpeed: 1.41
+    footHeight: 0.02
+    bodyHeight: -0.5
+    sinPower: -1
+    targetReachThreshold: 0.08
+    lerpCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0.2206567
+        outSlope: 0.2206567
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.9833374
+        value: 0.21697998
+        inSlope: 0.2206567
+        outSlope: 0.2206567
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    footHeightCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.0041656494
+        value: -0.01651001
+        inSlope: 6.708484
+        outSlope: 6.708484
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.14619446
+        value: 0.936288
+        inSlope: 0.02591482
+        outSlope: 0.02591482
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.110489115
+      - serializedVersion: 3
+        time: 0.9916687
+        value: 0.025943756
+        inSlope: -1.0767262
+        outSlope: -1.0767262
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    handHeightCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: -0.0027630627
+        value: -0.072164536
+        inSlope: -0.046458747
+        outSlope: -0.046458747
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.60367745
+        value: -0.100339
+        inSlope: -0.013204387
+        outSlope: -0.013204387
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.7319869
+      - serializedVersion: 3
+        time: 0.86091113
+        value: -0.04340172
+        inSlope: 0.22134459
+        outSlope: 0.22134459
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    handHeightOffset: 0.86
+    handHeight: 0.04
+  dampedTransformDataList:
+  - objectName: spine_02.x_DampedTransform
+    positionWeight: 0
+    rotationWeight: 0
+  - objectName: spine_03.x_DampedTransform
+    positionWeight: 0
+    rotationWeight: 0
+  - objectName: neck.x_DampedTransform
+    positionWeight: 0
+    rotationWeight: 0
+  - objectName: spine_01.x_DampedTransform
+    positionWeight: 0
+    rotationWeight: 0
+  twoBoneIKConstraintDataList:
+  - objectName: hand.lIK
+    weight: 1
+    positionWeight: 0.376
+    rotationWeight: 0
+    hintWeight: 0
+  - objectName: hand.rIK
+    weight: 1
+    positionWeight: 0.355
+    rotationWeight: 0
+    hintWeight: 0
+  - objectName: foot.lIK
+    weight: 1
+    positionWeight: 0.589
+    rotationWeight: 0
+    hintWeight: 0
+  - objectName: foot.rIK
+    weight: 1
+    positionWeight: 0.525
+    rotationWeight: 0
+    hintWeight: 0

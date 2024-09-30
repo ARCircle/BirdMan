@@ -4,9 +4,28 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI; // UIを使用するために必要
 using System.Collections;
 
+[System.Serializable]
+public struct ObjectParameters
+{
+    public float forceMultiplierUp;
+    public float forceMultiplierDown;
+    public float forceMultiplierLeft;
+    public float forceMultiplierFallDown;
+    public float maxForwardSpeed;
+    public float maxForwardFallSpeed;
+    public float forceMultiplierForward;
+    public float forceMultiplierFallForward;
+    public float forceMultiplierForwardStop;
+    public float forceMagnitudeThreshold;
+    public float maxUpSpeed;
+    public float maxDownSpeed;
+    public float maxLift;
+    public float liftMultiplier;
+    public float resistance;
+}
 public class BirdControl : MonoBehaviour
 {
-    public GameObject Bird;
+    public GameObject Player;
     public GameObject WingL;
     public GameObject WingR;
     private float targetRotationZL = 0f;
@@ -22,12 +41,17 @@ public class BirdControl : MonoBehaviour
 
     private Vector2 initialClickPosition;
     private bool isDragging = false;
+  
+  
 
-
+    public ObjectParameters bird;
+    public ObjectParameters plane;
+    Animator anime;
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         ClickPositionImage.gameObject.SetActive(false); // 最初は非表示にしておく
+   anime=Player.GetComponent<Animator>();
     }
 
     private float lastDragDistanceY;
@@ -147,9 +171,12 @@ public class BirdControl : MonoBehaviour
             // 右翼のZ軸の回転を目標値に近づける
             newRotationZR = Mathf.MoveTowardsAngle(WingR.transform.eulerAngles.z, targetRotationZR, rotationSpeed * Time.deltaTime);
             WingR.transform.rotation = Quaternion.Euler(WingR.transform.eulerAngles.x, WingR.transform.eulerAngles.y, newRotationZR);
-            Fly(newRotationZL, newRotationZR,dragDistance.x);
+            if(Player.name=="Bird")
+            Bird(newRotationZL, newRotationZR,dragDistance.x);
+            if (Player.name == "Plane")
+                Plane(dragDistance.x, dragDistance.y);
             AngleText(newRotationZL, newRotationZR);
-            Anime(newRotationZL, newRotationZR, dragDistance.x);
+            Anime(newRotationZL, newRotationZR, dragDistance.x,dragDistance.y);
 
             if (rb.velocity.y < minVelocityY)
                 rb.velocity = new Vector3(rb.velocity.x, minVelocityY, rb.velocity.z);
@@ -158,7 +185,7 @@ public class BirdControl : MonoBehaviour
 
     private float previousRotationZL = 0f;
     private float previousRotationZR = 0f;
-    public float forceMultiplierUp = 1f;
+    /*public float forceMultiplierUp = 1f;
     public float forceMultiplierDown = 1f;
     public float forceMultiplierLeft = 1f;
     public float forceMultiplierFallDown = 1f;
@@ -172,11 +199,12 @@ public class BirdControl : MonoBehaviour
     public float maxDownSpeed = -10f;
     public float maxLift = 1f;
     public float liftMultipler = 1f;
-    public float resistance = -1f;
-    public Animator anime;
+    public float resistance = -1f;*/
+    
 
-    void Fly(float L, float R,float dragX)
+    void Bird(float L, float R,float dragX)
     {
+       
         float forwardSpeed = Vector3.Dot(rb.velocity, rb.transform.forward);
         if (R > 20)
             R = R - 360;
@@ -185,16 +213,16 @@ public class BirdControl : MonoBehaviour
         //rb.AddForce(Vector3.right * (L - R) * forceMultiplierLeft);
         if(Mathf.Abs( dragX * 0.1f) >60f)
             dragX = 60*Mathf.Sign(dragX);
-        rb.AddForce(Vector3.right * dragX*0.1f * forceMultiplierLeft);
+        rb.AddForce(Vector3.right * dragX*0.1f * bird.forceMultiplierLeft*Time.deltaTime);
 
-        if (forwardSpeed < maxForwardSpeed)
+        if (forwardSpeed < bird.maxForwardSpeed)
         {
-            rb.AddForce(rb.transform.forward * forceMultiplierForward);
+            rb.AddForce(rb.transform.forward * bird.forceMultiplierForward * Time.deltaTime);
         }
 
         if (isArmL || isArmR)
         {
-            rb.AddForce(rb.transform.up * resistance);
+            rb.AddForce(rb.transform.up * bird.resistance * Time.deltaTime);
         }
 
         float upSpeed = Vector3.Dot(rb.velocity, rb.transform.up);
@@ -202,35 +230,55 @@ public class BirdControl : MonoBehaviour
 
         if (L > 0 || R > 0)
         {
-            rb.AddForce(Vector3.up * (L + R) * forceMultiplierFallDown);
-            if (forwardSpeed < maxForwardFallSpeed)
+            rb.AddForce(Vector3.up * (L + R) * bird.forceMultiplierFallDown * Time.deltaTime);
+            if (forwardSpeed < bird.maxForwardFallSpeed)
             {
-                rb.AddForce(rb.transform.forward * forceMultiplierFallForward);
+                rb.AddForce(rb.transform.forward * bird.forceMultiplierFallForward);
             }
         }
 
         if (L < 0 || R < 0)
         {
-            rb.AddForce(rb.transform.forward * forceMultiplierForwardStop);
+            rb.AddForce(rb.transform.forward * bird.forceMultiplierForwardStop * Time.deltaTime);
         }
 
-        if (forceMagnitude > forceMagnitudethreshold)
+        if (forceMagnitude > bird.forceMagnitudeThreshold)
         {
-            if (upSpeed < maxUpSpeed)
+            if (upSpeed < bird.maxUpSpeed)
             {
-                rb.AddForce(Vector3.up * forceMagnitude * forceMultiplierUp);
+                rb.AddForce(Vector3.up * forceMagnitude * bird.forceMultiplierUp * Time.deltaTime);
             }
         }
-        else if (forceMagnitude < -forceMagnitudethreshold)
+        else if (forceMagnitude < -bird.forceMagnitudeThreshold)
         {
-            if (upSpeed < maxDownSpeed)
+            if (upSpeed < bird.maxDownSpeed)
             {
-                rb.AddForce(Vector3.up * forceMagnitude * forceMultiplierDown);
+                rb.AddForce(Vector3.up * forceMagnitude * bird.forceMultiplierDown * Time.deltaTime);
             }
         }
 
         previousRotationZL = L;
         previousRotationZR = R;
+    }
+
+    void Plane(float dragX ,float dragY)
+    {
+        //print(Time.deltaTime+"  "+1/ Time.deltaTime);
+        //rb.AddForce(Vector3.right * (L - R) * forceMultiplierLeft);
+        if (Mathf.Abs(dragX * 0.1f) > 60f)
+            dragX = 60 * Mathf.Sign(dragX);
+        rb.AddForce(Vector3.right * dragX * 0.1f * plane.forceMultiplierLeft * Time.deltaTime);
+
+        if (Mathf.Abs(dragY * 0.1f) > 60f)
+            dragY = 60 * Mathf.Sign(dragY);
+        rb.AddForce(Vector3.up * dragY * 0.01f * plane.forceMultiplierUp * Time.deltaTime);
+
+        float forwardSpeed = Vector3.Dot(rb.velocity, rb.transform.forward);
+      
+        if (forwardSpeed < plane.maxForwardSpeed)
+        {
+            rb.AddForce(rb.transform.forward * plane.forceMultiplierForward * Time.deltaTime);
+        }
     }
 
     void AngleText(float L, float R)
@@ -243,7 +291,8 @@ public class BirdControl : MonoBehaviour
          //   AngleR.text = "" + (R - 360).ToString("F0");
     }
 
-    void Anime(float L, float R,float dragX)
+    
+    void Anime(float L, float R,float dragX, float dragY)
     {
         if (R > 20)
             R = R - 360;
@@ -255,6 +304,7 @@ public class BirdControl : MonoBehaviour
         anime.SetFloat("Left", L / 20f);
         anime.SetFloat("Right", R / 20f);
         anime.SetFloat("Turn", dragX * 0.1f / 40f / 3f);
+        anime.SetFloat("Pitch", dragY * 0.1f / 40f / 3f);
         /*
         anime.SetFloat("Left", L / 20f);
         anime.SetFloat("Right", R / 20f);

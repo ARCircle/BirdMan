@@ -841,7 +841,13 @@ PlayerSettings:
   XboxOneOverrideIdentityPublisher: 
   vrEditorSettings: {}
   cloudServicesEnabled:
+    Build: 0
+    Game Performance: 0
+    Legacy Analytics: 0
+    Purchasing: 0
+    UDP: 0
     UNet: 1
+    Unity Ads: 0
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -861,7 +867,7 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: adbbef2f-7981-4e1b-a0ba-cca4353d1bb1
+  cloudProjectId: f633942b-071b-4883-ae36-c41bba1dbb99
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: BirdManAR
