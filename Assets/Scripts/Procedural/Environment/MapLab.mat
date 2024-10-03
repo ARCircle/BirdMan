@@ -116,7 +116,7 @@ Material:
     - _HeightBorder2: -75
     - _HeightBorderUp: 0
     - _HeightInterval: 0.2
-    - _HeightInterval1: 10
+    - _HeightInterval1: 1.24
     - _HeightInterval2: 5
     - _HeightInterval3: 10
     - _HeightIntervalUnder: 0.1

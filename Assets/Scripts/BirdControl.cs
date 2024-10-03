@@ -1,8 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // UI‚ğg—p‚·‚é‚½‚ß‚É•K—v
+using UnityEngine.UI; // UIã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚ã«å¿…è¦
 using System.Collections;
+using UnityEngine.Animations.Rigging;  // Chain IK ConstraintãŒå«ã¾ã‚Œã¦ã„ã‚‹åå‰ç©ºé–“
 
 [System.Serializable]
 public struct ObjectParameters
@@ -30,8 +31,8 @@ public class BirdControl : MonoBehaviour
     public GameObject WingR;
     private float targetRotationZL = 0f;
     private float targetRotationZR = 0f;
-    public float rotationSpeed = 5f; // ‰ñ“]‘¬“x‚ğ’²®‚·‚é
-    public Image ClickPositionImage; // ‰ŠúƒNƒŠƒbƒN’n“_‚ğ•\¦‚·‚éƒCƒ[ƒW
+    public float rotationSpeed = 5f; // å›è»¢é€Ÿåº¦ã‚’èª¿æ•´ã™ã‚‹
+    public Image ClickPositionImage; // åˆæœŸã‚¯ãƒªãƒƒã‚¯åœ°ç‚¹ã‚’è¡¨ç¤ºã™ã‚‹ã‚¤ãƒ¡ãƒ¼ã‚¸
     bool isArmL;
     bool isArmR;
     Rigidbody rb;
@@ -50,15 +51,17 @@ public class BirdControl : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        ClickPositionImage.gameObject.SetActive(false); // Å‰‚Í”ñ•\¦‚É‚µ‚Ä‚¨‚­
+        ClickPositionImage.gameObject.SetActive(false); // æœ€åˆã¯éè¡¨ç¤ºã«ã—ã¦ãŠã
    anime=Player.GetComponent<Animator>();
+        // ç¾åœ¨ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åˆæœŸXè»¸å›è»¢ã‚’ä¿å­˜
+        initialRotationX = Tail.transform.localEulerAngles.x;
     }
 
     private float lastDragDistanceY;
     private float dragTimeCounter;
-    public float dragTimeThreshold = 0.5f; // ˆê’èŠÔ‚Ìè‡’li•bj
-    public float oscillationSpeed = 1.0f; // U“®‚Ì‘¬“x
-    public float oscillationAmplitude = 5.0f; // U“®‚ÌU•
+    public float dragTimeThreshold = 0.5f; // ä¸€å®šæ™‚é–“ã®é–¾å€¤ï¼ˆç§’ï¼‰
+    public float oscillationSpeed = 1.0f; // æŒ¯å‹•ã®é€Ÿåº¦
+    public float oscillationAmplitude = 5.0f; // æŒ¯å‹•ã®æŒ¯å¹…
     private float currentRotationValue = 0f;
     private float startTime;
     Vector2 dragDistance;
@@ -67,122 +70,138 @@ public class BirdControl : MonoBehaviour
         var pointer = Pointer.current;
         if (pointer != null)
         {
-            if (pointer.press.isPressed)
+            // ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ä¸­å¿ƒç‚¹ã‚’åˆæœŸã‚¯ãƒªãƒƒã‚¯ä½ç½®ã¨ã—ã¦è¨­å®š
+            initialClickPosition = new Vector2(Screen.width / 2, Screen.height / 2);
+
+            // ãƒã‚¦ã‚¹ã®ç¾åœ¨ã®ä½ç½®ã‚’å¸¸ã«å–å¾—
+            Vector2 currentPosition = pointer.position.ReadValue();
+            dragDistance = currentPosition - initialClickPosition;
+
+            // æ–¹å‘ã«å¿œã˜ãŸå›è»¢ã‚’è¨ˆç®—
+            float angle = Mathf.Atan2(dragDistance.y, dragDistance.x) * Mathf.Rad2Deg;
+            ClickPositionImage.transform.parent.rotation = Quaternion.Euler(0, 0, angle);
+
+            // ä¼¸ã³ã‚‹ã‚ˆã†ã«å¹…ã‚’èª¿æ•´
+            ClickPositionImage.rectTransform.sizeDelta = new Vector2(dragDistance.magnitude, ClickPositionImage.rectTransform.sizeDelta.y);
+
+            // ãƒ‰ãƒ©ãƒƒã‚°è·é›¢ã®å¤‰åŒ–ã‚’ãƒã‚§ãƒƒã‚¯
+            if (Mathf.Abs(dragDistance.y - lastDragDistanceY) > 1)
             {
-                if (!isDragging)
-                {
+                dragTimeCounter = 0f;
+                lastDragDistanceY = dragDistance.y;
+                currentRotationValue = dragDistance.y * 0.1f; // èª¿æ•´ä¿‚æ•°ã‚’ã‹ã‘ã¦å›è»¢é€Ÿåº¦ã‚’èª¿æ•´
 
-                    // ƒhƒ‰ƒbƒOŠJn
-                    initialClickPosition = pointer.position.ReadValue();
-                    isDragging = true;
-                    lastDragDistanceY = initialClickPosition.y;
-                    dragTimeCounter = 0f;
-                    currentRotationValue = 0f;
-                    startTime = 0f; // ‰Šú‰»
-                    // ‰ŠúƒNƒŠƒbƒN’n“_‚ğ‰æ–Ê‚É•\¦
-                    ClickPositionImage.transform.parent.position = initialClickPosition;
-                    ClickPositionImage.gameObject.SetActive(true);
-
-
-                }
-                else
-                {
-                    // ƒhƒ‰ƒbƒO’†
-                    Vector2 currentPosition = pointer.position.ReadValue();
-                    dragDistance = currentPosition - initialClickPosition;
-
-                    // •ûŒü‚É‰‚¶‚½‰ñ“]‚ğŒvZ
-                    float angle = Mathf.Atan2(dragDistance.y, dragDistance.x) * Mathf.Rad2Deg;
-                    ClickPositionImage.transform.parent.rotation = Quaternion.Euler(0, 0, angle);
-
-                    // L‚Ñ‚é‚æ‚¤‚É•‚ğ’²®
-                    ClickPositionImage.rectTransform.sizeDelta = new Vector2(dragDistance.magnitude, ClickPositionImage.rectTransform.sizeDelta.y);
-
-                    // ƒhƒ‰ƒbƒO‹——£‚Ì•Ï‰»‚ğƒ`ƒFƒbƒN
-                    if (Mathf.Abs(dragDistance.y - lastDragDistanceY) > 1)
-                    {
-                        dragTimeCounter = 0f;
-                        lastDragDistanceY = dragDistance.y;
-                        currentRotationValue = dragDistance.y * 0.1f; // ’²®ŒW”‚ğ‚©‚¯‚Ä‰ñ“]‘¬“x‚ğ’²®
-
-                        startTime = 0f; // U“®‚ğƒŠƒZƒbƒg
-                    }
-                    else
-                    {
-                        dragTimeCounter += Time.deltaTime;
-                    }
-
-                    if (dragTimeCounter >= dragTimeThreshold)
-                    {
-                        if (startTime == 0f)
-                        {
-                            startTime = Time.time;
-                        }
-                        // U“®‚³‚¹‚é
-                        float oscillation = Mathf.Sin((Time.time - startTime) * oscillationSpeed) * oscillationAmplitude;
-                       // targetRotationZL = Mathf.Clamp(currentRotationValue + oscillation, -20f, 20f);
-                       // targetRotationZR = Mathf.Clamp(currentRotationValue + oscillation, -20f, 20f);
-                        isArmL = true;
-                        isArmR = true;
-                    }
-                    else
-                    {
-                        if (Mathf.Abs(dragDistance.y) > 1) // ã‰º•ûŒü‚Ö‚Ìƒhƒ‰ƒbƒO
-                        {
-                            currentRotationValue = dragDistance.y * 0.1f; // ’²®ŒW”‚ğ‚©‚¯‚Ä‰ñ“]‘¬“x‚ğ’²®
-                            targetRotationZL = Mathf.Clamp(currentRotationValue, -20f, 20f);
-                            isArmL = true;
-                            targetRotationZR = Mathf.Clamp(currentRotationValue, -20f, 20f);
-                            isArmR = true;
-                        }
-                        else
-                        {
-                            targetRotationZL = 0f;
-                            isArmL = false;
-                            targetRotationZR = 0f;
-                            isArmR = false;
-                        }
-                    }
-                    /* if (Mathf.Abs(dragDistance.x) > 1) // ã‰º•ûŒü‚Ö‚Ìƒhƒ‰ƒbƒO
-                     {
-                         if (Mathf.Abs(dragDistance.x * 0.1f) >= 10)
-                             dragDistance.x = 10 * Mathf.Sign(dragDistance.x);
-                         targetRotationZL += dragDistance.x * 0.1f; // ’²®ŒW”‚ğ‚©‚¯‚Ä‰ñ“]‘¬“x‚ğ’²®
-                             isArmL = true;
-                             targetRotationZR -= dragDistance.x * 0.1f;
-                             isArmR = true;
-
-                     }*/
-                }
+                startTime = 0f; // æŒ¯å‹•ã‚’ãƒªã‚»ãƒƒãƒˆ
             }
             else
             {
-                targetRotationZL = 0f;
-                isArmL = false;
-                targetRotationZR = 0f;
-                isArmR = false;
-                isDragging = false;
-                ClickPositionImage.gameObject.SetActive(false); // ƒhƒ‰ƒbƒOI—¹‚É”ñ•\¦‚É‚·‚é
+                dragTimeCounter += Time.deltaTime;
             }
-            // ¶—ƒ‚ÌZ²‚Ì‰ñ“]‚ğ–Ú•W’l‚É‹ß‚Ã‚¯‚é
-            newRotationZL = Mathf.MoveTowardsAngle(WingL.transform.eulerAngles.z, targetRotationZL, rotationSpeed * Time.deltaTime);
-            WingL.transform.rotation = Quaternion.Euler(WingL.transform.eulerAngles.x, WingL.transform.eulerAngles.y, newRotationZL);
 
-            // ‰E—ƒ‚ÌZ²‚Ì‰ñ“]‚ğ–Ú•W’l‚É‹ß‚Ã‚¯‚é
-            newRotationZR = Mathf.MoveTowardsAngle(WingR.transform.eulerAngles.z, targetRotationZR, rotationSpeed * Time.deltaTime);
-            WingR.transform.rotation = Quaternion.Euler(WingR.transform.eulerAngles.x, WingR.transform.eulerAngles.y, newRotationZR);
-            if(Player.name=="Bird")
-            Bird(newRotationZL, newRotationZR,dragDistance.x);
-            if (Player.name == "Plane")
-                Plane(dragDistance.x, dragDistance.y);
-            AngleText(newRotationZL, newRotationZR);
-            Anime(newRotationZL, newRotationZR, dragDistance.x,dragDistance.y);
-
-            if (rb.velocity.y < minVelocityY)
-                rb.velocity = new Vector3(rb.velocity.x, minVelocityY, rb.velocity.z);
+            if (dragTimeCounter >= dragTimeThreshold)
+            {
+                if (startTime == 0f)
+                {
+                    startTime = Time.time;
+                }
+                // æŒ¯å‹•ã•ã›ã‚‹
+                float oscillation = Mathf.Sin((Time.time - startTime) * oscillationSpeed) * oscillationAmplitude;
+                isArmL = true;
+                isArmR = true;
+            }
+            else
+            {
+                if (Mathf.Abs(dragDistance.y) > 1) // ä¸Šä¸‹æ–¹å‘ã¸ã®ãƒ‰ãƒ©ãƒƒã‚°
+                {
+                    currentRotationValue = dragDistance.y * 0.1f; // èª¿æ•´ä¿‚æ•°ã‚’ã‹ã‘ã¦å›è»¢é€Ÿåº¦ã‚’èª¿æ•´
+                    targetRotationZL = Mathf.Clamp(currentRotationValue, -20f, 20f);
+                    isArmL = true;
+                    targetRotationZR = Mathf.Clamp(currentRotationValue, -20f, 20f);
+                    isArmR = true;
+                }
+                else
+                {
+                    targetRotationZL = 0f;
+                    isArmL = false;
+                    targetRotationZR = 0f;
+                    isArmR = false;
+                }
+            }
         }
+        else
+        {
+            targetRotationZL = 0f;
+            isArmL = false;
+            targetRotationZR = 0f;
+            isArmR = false;
+            isDragging = false;
+            ClickPositionImage.gameObject.SetActive(false); // ãƒ‰ãƒ©ãƒƒã‚°çµ‚äº†æ™‚ã«éè¡¨ç¤ºã«ã™ã‚‹
+        }
+
+        // ç¿¼ã®å›è»¢å‡¦ç†
+        newRotationZL = Mathf.MoveTowardsAngle(WingL.transform.eulerAngles.z, targetRotationZL, rotationSpeed * Time.deltaTime);
+        WingL.transform.rotation = Quaternion.Euler(WingL.transform.eulerAngles.x, WingL.transform.eulerAngles.y, newRotationZL);
+
+        newRotationZR = Mathf.MoveTowardsAngle(WingR.transform.eulerAngles.z, targetRotationZR, rotationSpeed * Time.deltaTime);
+        WingR.transform.rotation = Quaternion.Euler(WingR.transform.eulerAngles.x, WingR.transform.eulerAngles.y, newRotationZR);
+
+        if (Player.name == "Bird")
+            Bird(newRotationZL, newRotationZR, dragDistance.x);
+        if (Player.name == "Plane")
+            Plane(dragDistance.x, dragDistance.y);
+
+        AngleText(newRotationZL, newRotationZR);
+        Anime(newRotationZL, newRotationZR, dragDistance.x, dragDistance.y);
+
+        if (rb.velocity.y < minVelocityY)
+            rb.velocity = new Vector3(rb.velocity.x, minVelocityY, rb.velocity.z);
+
+        IKWeightOscillator();
+        TailOscillator();
     }
 
+    public ChainIKConstraint chainIKR;  // Chain IK Constraintã‚’ã‚¢ã‚¿ãƒƒãƒã™ã‚‹
+    public ChainIKConstraint chainIKL;  // Chain IK Constraintã‚’ã‚¢ã‚¿ãƒƒãƒã™ã‚‹
+    public float frequency = 1.0f;     // æŒ¯å‹•ã®å‘¨æ³¢æ•°
+    public float amplitude = 0.5f;     // æŒ¯å‹•ã®æŒ¯å¹…
+    public float baseWeight = 0.5f;    // Weightã®åŸºæœ¬å€¤
+
+    public GameObject Tail;
+    public float frequencyTail = 1.0f;     // æŒ¯å‹•ã®å‘¨æ³¢æ•°
+    public float amplitudeTail = 30.0f;    // æŒ¯å‹•ã®æŒ¯å¹… (åº¦æ•°)
+    private float initialRotationX;    // åˆæœŸã®Xè»¸å›è»¢ã‚’ä¿å­˜
+
+    void IKWeightOscillator()
+    {
+       
+            // Weightã‚’æŒ¯å‹•ã•ã›ã‚‹ï¼ˆæ­£å¼¦æ³¢ã§0ã€œ1ã®ç¯„å›²ã«å¤‰åŒ–ï¼‰
+            float oscillation = amplitude * Mathf.Sin(Time.time * frequency * 2.0f * Mathf.PI);
+            chainIKR.weight = Mathf.Clamp(baseWeight + oscillation, 0.0f, 1.0f);  // 0ã€œ1ã®ç¯„å›²ã«åˆ¶é™
+            chainIKL.weight = Mathf.Clamp(baseWeight + oscillation, 0.0f, 1.0f);  // 0ã€œ1ã®ç¯„å›²ã«åˆ¶é™
+        
+    }
+
+   
+    public GameObject Hip;
+    public float hipRotationInfluence = 1.0f; // Hipã®å›è»¢ãŒTailã®Xè»¸å›è»¢ã«ä¸ãˆã‚‹å½±éŸ¿åº¦
+
+    void TailOscillator()
+    {
+        // Tailã®Xè»¸ã®ã¿ã‚’æŒ¯å‹•ã•ã›ã‚‹
+        float oscillation = amplitudeTail * Mathf.Sin(Time.time * frequencyTail * 2.0f * Mathf.PI);
+
+        // Hipã®Yè»¸ã®å›è»¢è§’åº¦ã‚’å–å¾—ï¼ˆ-180ã‹ã‚‰180ã®ç¯„å›²ï¼‰
+        float hipRotationY = Hip.transform.localEulerAngles.y;
+        if (hipRotationY > 180) hipRotationY -= 360;  // -180ã€œ180ã«æ­£è¦åŒ–
+
+        // Hipã®Yè»¸å›è»¢ã«å¿œã˜ãŸTailã®Xè»¸ã®è¿½åŠ å›è»¢é‡ã‚’è¨ˆç®—
+        float hipRotationEffect = hipRotationY * hipRotationInfluence;
+
+        // Tailã®å›è»¢ã‚’æ›´æ–°
+        Vector3 newRotation = Tail.transform.localEulerAngles;
+        newRotation.x = initialRotationX + oscillation + hipRotationEffect;  // åˆæœŸå›è»¢ + æŒ¯å‹• + Hipã®å½±éŸ¿
+        Tail.transform.localEulerAngles = newRotation;  // æ–°ã—ã„å›è»¢ã‚’é©ç”¨
+    }
     private float previousRotationZL = 0f;
     private float previousRotationZR = 0f;
     /*public float forceMultiplierUp = 1f;
@@ -212,7 +231,7 @@ public class BirdControl : MonoBehaviour
             L = L - 360;
         //rb.AddForce(Vector3.right * (L - R) * forceMultiplierLeft);
         if(Mathf.Abs( dragX * 0.1f) >60f)
-            dragX = 60*Mathf.Sign(dragX);
+            dragX = 600*Mathf.Sign(dragX);
         rb.AddForce(Vector3.right * dragX*0.1f * bird.forceMultiplierLeft*Time.deltaTime);
 
         if (forwardSpeed < bird.maxForwardSpeed)
@@ -300,7 +319,7 @@ public class BirdControl : MonoBehaviour
             L = L - 360;
 
         if (Mathf.Abs(dragX * 0.1f) >60f)
-            dragX = 60 * Mathf.Sign(dragX);
+            dragX = 600 * Mathf.Sign(dragX);
         anime.SetFloat("Left", L / 20f);
         anime.SetFloat("Right", R / 20f);
         anime.SetFloat("Turn", dragX * 0.1f / 40f / 3f);

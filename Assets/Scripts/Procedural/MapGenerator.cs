@@ -29,6 +29,7 @@ public class MapGenerator : MonoBehaviour
 
     void Start()
     {
+      
         // まずブーリアン処理なしで地形を生成
         GenerateMeshUsingComputeShader(new Vector3[0]);
 

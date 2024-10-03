@@ -168,7 +168,7 @@ public class PlaneManager : MonoBehaviour
             validPosition = true;
 
             // 他のオブジェクトと重ならないように配置する
-            foreach (var trackedObject in ObjectNameUI.Instance.trackedObjects)
+            foreach (var trackedObject in ObjectNameUI2.Instance.trackedObjects)
             {
                 if (Vector3.Distance(position, trackedObject.ObjectToTrack.transform.position) < objectMinDistance)
                 {

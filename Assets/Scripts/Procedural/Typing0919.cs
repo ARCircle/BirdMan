@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class Typing0919 : MonoBehaviour
 {
     public GameObject player; // プレイヤーオブジェクトを参照
-    private List<ObjectNameUI.TrackedObject> trackedObjects; // ObjectNameUIのTrackedObjectを参照
+    private List<ObjectNameUI2.TrackedObject> trackedObjects; // ObjectNameUIのTrackedObjectを参照
 
     public float detectionRadius = 10f; // プレイヤーの検知範囲
 
@@ -18,7 +18,7 @@ public class Typing0919 : MonoBehaviour
     void Start()
     {
         // ObjectNameUIのインスタンスからTrackedObjectリストを取得
-        trackedObjects = ObjectNameUI.Instance.trackedObjects;
+        trackedObjects = ObjectNameUI2.Instance.trackedObjects;
 
         UpdateAllTextColors();
     }

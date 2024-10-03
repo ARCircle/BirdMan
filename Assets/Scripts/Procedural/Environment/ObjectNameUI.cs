@@ -1,10 +1,10 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
-public class ObjectNameUI : MonoBehaviour
+public class ObjectNameUI2 : MonoBehaviour
 {
     // シングルトンのインスタンス
-    public static ObjectNameUI Instance { get; private set; }
+    public static ObjectNameUI2 Instance { get; private set; }
 
     public class TrackedObject
     {
