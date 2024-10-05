@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class MapGenerator : MonoBehaviour
@@ -26,38 +27,74 @@ public class MapGenerator : MonoBehaviour
 
     // ブーリアンオブジェクトの最大数を定義
     private const int MAX_BOOLEAN_VERTICES = 10000; // 必要に応じて調整
-
+   
     void Start()
     {
       
         // まずブーリアン処理なしで地形を生成
         GenerateMeshUsingComputeShader(new Vector3[0]);
 
-        // その後にブーリアン処理を適用した地形を生成
-        StartCoroutine(GenerateTerrainAndApplyBoolean());
+       // その後にブーリアン処理を適用した地形を生成
+       //StartCoroutine(GenerateTerrainAndApplyBoolean());
     }
 
-    private IEnumerator GenerateTerrainAndApplyBoolean()
+    /*public void GenerateBooleanTerrain()
     {
         // 1. L-System Meshを生成
         List<Vector3> booleanVertices = new List<Vector3>();
-        foreach (var lSystemGenerator in lSystemGenerators)
+        //print("GenerateBooleanTerrain()");
+        if (lSystemGenerators.Count != 0)
         {
-            if (lSystemGenerator != null)
+            foreach (LSystemMeshGenerator lSystemGenerator in lSystemGenerators)
             {
-                Mesh lSystemMesh = lSystemGenerator.GenerateTreeMesh(gameObject);
-                if (lSystemMesh != null)
-                {
-                    // メッシュの頂点を取得し、リストに追加
-                    booleanVertices.AddRange(lSystemMesh.vertices);
-                }
-                yield return null; // 次のフレームまで待機
-            }
-        }
+              //  print($" lSystemGenerator: ({lSystemGenerator.name})");
 
-        // 2. Compute Shaderで地形を生成し、ブーリアン処理を適用
-        GenerateMeshUsingComputeShader(booleanVertices.ToArray());
-    }
+                if (lSystemGenerator != null)
+                {
+                    // Mesh lSystemMesh = lSystemGenerator.GenerateTreeMesh(gameObject);
+                    Mesh lSystemMesh = lSystemGenerator.GetComponent<MeshFilter>().sharedMesh;
+                    Mesh mesh = GetComponent<MeshFilter>().sharedMesh;
+                    if (lSystemMesh != null)
+                    {
+
+                        // メッシュのローカル座標での頂点をワールド座標に変換
+                        Vector3 meshPosition = lSystemGenerator.transform.position;
+
+                        for (int i = 0; i < lSystemMesh.vertices.Length; i++)
+                        {
+                          //  print($" meshPosition{i}: ({meshPosition})");
+                          //  print($"lSystemMesh.vertices {i}: ({lSystemMesh.vertices[i]})");
+                            // 各頂点にメッシュの位置を考慮
+                            //Vector3 worldVertex = lSystemGenerator.transform.TransformPoint(lSystemMesh.vertices[i]);
+                            booleanVertices.Add(lSystemMesh.vertices[i] + meshPosition);  // メッシュの位置を引く
+                        //    booleanVertices.Add(lSystemMesh.vertices[i]);  // メッシュの位置を引く
+                            //print($"頂点 {i}: ({lSystemMesh.vertices[i]})+mesh {i}: ({mesh.vertices[i]})");
+                        }
+                       // lSystemGenerator.gameObject.SetActive(true);
+                        // メッシュの頂点を取得し、リストに追加
+                         //booleanVertices.AddRange(lSystemMesh.vertices);
+                        // print(lSystemMesh.vertices.Length);
+
+                        // 各頂点の座標を表示
+                        //  for (int i = 0; i < lSystemMesh.vertices.Length; i++)
+                        // {
+                        //   Vector3 vertex = lSystemMesh.vertices[i];
+                        // print($"頂点 {i}: ({vertex.x}, {vertex.y}, {vertex.z})");
+                        // }
+                    }
+
+
+                }
+
+            }
+
+
+            // 2. Compute Shaderで地形を生成し、ブーリアン処理を適用
+            GenerateMeshUsingComputeShader(booleanVertices.ToArray());
+        }
+        
+   } */
+
 
     void GenerateMeshUsingComputeShader(Vector3[] booleanVertices)
     {
@@ -66,6 +103,7 @@ public class MapGenerator : MonoBehaviour
 
         // Compute Shader のスレッド数を計算
         int threadGroupSize = Mathf.CeilToInt((float)(gridSize + 1) / 8.0f);
+      ///  Debug.Log("ThreadGroupSize: " + threadGroupSize);
 
         // 頂点データを格納するバッファを作成
         ComputeBuffer vertexBuffer = new ComputeBuffer(vertexCount, sizeof(float) * 5); // float3 (position) + float2 (uv)
@@ -79,15 +117,17 @@ public class MapGenerator : MonoBehaviour
 
         // メッシュの位置をglobalOffsetとしてシェーダーに渡す
         Vector2 globalOffset = new Vector2(transform.position.x, transform.position.z);
+        //Vector2 globalOffset = new Vector2(transform.position.x, transform.position.z);
         meshComputeShader.SetVector("globalOffset", globalOffset);
 
         // ブーリアンオブジェクトの頂点データを準備
         int booleanVertexCount = booleanVertices.Length;
-
-        if (booleanVertexCount > 0)
+        //print(booleanVertexCount);
+        /*if (booleanVertexCount > 0)
         {
+          
             booleanVertexCount = Mathf.Min(booleanVertexCount, MAX_BOOLEAN_VERTICES);
-
+            //print(booleanVertexCount);
             ComputeBuffer booleanVerticesBuffer = new ComputeBuffer(MAX_BOOLEAN_VERTICES, sizeof(float) * 3);
             booleanVerticesBuffer.SetData(booleanVertices);
 
@@ -96,21 +136,36 @@ public class MapGenerator : MonoBehaviour
             meshComputeShader.SetFloat("booleanDistance", booleanDistance);
             meshComputeShader.SetFloat("booleanEffectStrength", booleanEffectStrength);
 
-            //print(booleanVertexCount);
+            print(booleanVertexCount);
             // Compute Shader を実行
             meshComputeShader.Dispatch(0, threadGroupSize, threadGroupSize, 1);
 
-            // バッファを解放
             booleanVerticesBuffer.Release();
         }
         else
-        {
+        {*/
+            // print("boolean!!!!!");
+            //booleanVertexCount = Mathf.Min(booleanVertexCount, MAX_BOOLEAN_VERTICES);
+
+
             // ブーリアン処理を行わない場合、booleanVertexCountを0に設定
+            booleanVertexCount = Mathf.Min(booleanVertexCount, MAX_BOOLEAN_VERTICES);
+            //print(booleanVertexCount);
+            ComputeBuffer booleanVerticesBuffer = new ComputeBuffer(MAX_BOOLEAN_VERTICES, sizeof(float) * 3);
+            booleanVerticesBuffer.SetData(booleanVertices);
+
+           meshComputeShader.SetBuffer(0, "booleanVertices", booleanVerticesBuffer);
             meshComputeShader.SetInt("booleanVertexCount", 0);
+            meshComputeShader.SetFloat("booleanDistance", booleanDistance);
+            meshComputeShader.SetFloat("booleanEffectStrength", booleanEffectStrength);
+
 
             // Compute Shader を実行
             meshComputeShader.Dispatch(0, threadGroupSize, threadGroupSize, 1);
-        }
+            booleanVerticesBuffer.Release();
+            // バッファを解放
+
+       // }
 
         // 結果を取得する
         VertexData[] vertexData = new VertexData[vertexCount];
@@ -135,11 +190,11 @@ public class MapGenerator : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
 
         // メッシュコライダーの更新
-        if (meshCollider == null)
-        {
-            meshCollider = gameObject.AddComponent<MeshCollider>();
-        }
+       
+           meshCollider = gameObject.GetComponent<MeshCollider>();
+        
         meshCollider.sharedMesh = mesh;
+       // meshCollider.convex = true;
     }
 
     int[] CreateTriangles(int width, int height)
@@ -165,6 +220,8 @@ public class MapGenerator : MonoBehaviour
         meshCollider.sharedMesh = null;
         meshCollider.sharedMesh = mesh;
     }
+
+   
 }
 
 struct VertexData

@@ -124,20 +124,27 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     float3 currentPosition = float3(x, y, z);
 
     // ブーリアン処理の適用
-    if (booleanVertexCount > 0)
+    if (booleanVertexCount > 1)
     {
+     
         for (int i = 0; i < booleanVertexCount; i++)
         {
             float3 booleanVertex = booleanVertices[i];
             float dist = distance(currentPosition, booleanVertex);
             if (dist < booleanDistance)
             {
+
                 float effect = clamp(1.0f - (dist / booleanEffectStrength), 0.0f, 1.0f);
                 y -= effect * booleanEffectStrength;
                 currentPosition.y = y;
+                
+
             }
         }
+         //currentPosition = float3(0,0,0);
+        
     }
+   
 
     // 結果の書き込み
     result[index].position = currentPosition;

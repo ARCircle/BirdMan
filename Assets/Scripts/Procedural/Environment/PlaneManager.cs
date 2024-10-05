@@ -52,9 +52,12 @@ public class PlaneManager : MonoBehaviour
                 Vector3 planePosition = new Vector3(gridPosition.x * planeWidth, 0, gridPosition.y * planeLength);
                 GameObject newPlane = Instantiate(planePrefab, planePosition, Quaternion.identity);
                 planeGrid[gridPosition] = newPlane;
-
+                // newPlane.GetComponent<MapGenerator>().lSystemGenerators.Clear();
+                // newPlane.SetActive(true);
                 // Plane上にオブジェクトを配置
-                PlaceObjectsOnPlane(planePosition.z);
+                PlaceObjectsOnPlane(newPlane  ,planePosition.x, planePosition.z);
+                //newPlane.GetComponent<MapGenerator>().GenerateBooleanTerrain();
+
             }
         }
     }
@@ -77,16 +80,39 @@ public class PlaneManager : MonoBehaviour
             PreGenerateAdjacentPlanes(playerGridPosition);
             currentGridPosition = playerGridPosition;
 
+            // プレイヤーより後ろにあるPlaneを削除
+            RemovePlanesBehindPlayer();
             // 古いPlaneを削除
-            RemoveOldPlanes(playerGridPosition);
+            //  RemoveOldPlanes(playerGridPosition);
+        }
+      
+    }
+    void RemovePlanesBehindPlayer()
+    {
+        List<Vector2Int> planesToRemove = new List<Vector2Int>();
+
+        foreach (var plane in planeGrid)
+        {
+            // プレイヤーのz座標よりもPlaneが後ろにある場合、そのPlaneを削除
+            if (plane.Value.transform.position.z + 1024 < player.transform.position.z)
+            {
+                planesToRemove.Add(plane.Key);
+            }
+        }
+
+        // 削除するPlaneをリストから削除
+        foreach (var planeKey in planesToRemove)
+        {
+            // Planeとその上のオブジェクトを削除
+            Destroy(planeGrid[planeKey]);
+            planeGrid.Remove(planeKey);
         }
     }
-
     // 隣接するPlaneとそのさらに隣のPlaneを事前に生成
     void PreGenerateAdjacentPlanes(Vector2Int playerGridPosition)
     {
         // 現在のグリッドに加えて、周囲の8つの隣接グリッドとその隣も生成
-        for (int xOffset = -2; xOffset <= 2; xOffset++)
+        for (int xOffset = -3; xOffset <= 3; xOffset++)
         {
             for (int yOffset = 0; yOffset <= 2; yOffset++)
             {
@@ -98,9 +124,13 @@ public class PlaneManager : MonoBehaviour
                     Vector3 planePosition = new Vector3(adjacentGridPosition.x * planeWidth, 0, adjacentGridPosition.y * planeLength);
                     GameObject newPlane = Instantiate(planePrefab, planePosition, Quaternion.identity);
                     planeGrid[adjacentGridPosition] = newPlane;
+                    // newPlane.SetActive(true);
+                    //newPlane.GetComponent<MapGenerator>().lSystemGenerators.Clear();
 
                     // 新しいPlane上にオブジェクトを配置
-                    PlaceObjectsOnPlane(planePosition.z);
+                    PlaceObjectsOnPlane(newPlane ,planePosition.x, planePosition.z);
+                    //newPlane.GetComponent<MapGenerator>().GenerateBooleanTerrain();
+
                 }
             }
         }
@@ -132,13 +162,13 @@ public class PlaneManager : MonoBehaviour
     }
 
     // Plane上にオブジェクトを配置する
-    void PlaceObjectsOnPlane(float planeZPosition)
+    void PlaceObjectsOnPlane(GameObject plane, float planeXPosition, float planeZPosition)
     {
         int objectCount = Random.Range(1, maxObjectsPerPlane + 1); // ランダムにオブジェクト数を決定
         for (int i = 0; i < objectCount; i++)
         {
             // ランダムな位置とオブジェクトを選択
-            Vector3 randomPosition = GetRandomPositionOnPlane(planeZPosition);
+            Vector3 randomPosition = GetRandomPositionOnPlane(planeXPosition, planeZPosition);
             PrefabWithHeight randomPrefabWithHeight = objectPrefabs[Random.Range(0, objectPrefabs.Count)];
             GameObject randomPrefab = randomPrefabWithHeight.prefab;
 
@@ -146,22 +176,29 @@ public class PlaneManager : MonoBehaviour
             float randomHeight = Random.Range(randomPrefabWithHeight.heightRange.x, randomPrefabWithHeight.heightRange.y);
             randomPosition.y = randomHeight;
 
+            // オブジェクトを生成し、そのPlaneの子として設定
             GameObject newObject = Instantiate(randomPrefab, randomPosition, Quaternion.identity);
             newObject.name = randomPrefab.name;
+
+            // 生成したオブジェクトをPlaneの子供にする
+            newObject.transform.SetParent(plane.transform);
 
             newObject.SetActive(true);
         }
     }
 
     // Plane上でランダムにオブジェクトの配置位置を取得
-    Vector3 GetRandomPositionOnPlane(float planeZPosition)
+    // Plane上でランダムにオブジェクトの配置位置を取得
+    Vector3 GetRandomPositionOnPlane(float planeXPosition, float planeZPosition)
     {
         Vector3 position;
         bool validPosition;
 
         do
         {
-            float randomX = Random.Range(-xOffsetLimit, xOffsetLimit);
+            // x方向をplaneXPositionに基づいてランダムに設定
+            float randomX = Random.Range(planeXPosition - planeWidth / 2, planeXPosition + planeWidth / 2);
+            // z方向もplaneZPositionに基づいてランダムに設定
             float randomZ = Random.Range(planeZPosition - planeLength / 2, planeZPosition + planeLength / 2);
             position = new Vector3(randomX, 0, randomZ);
 
@@ -181,4 +218,7 @@ public class PlaneManager : MonoBehaviour
 
         return position;
     }
+
+   
+
 }

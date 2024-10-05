@@ -51,7 +51,7 @@ public class MapGenerator1 : MonoBehaviour
             if (lSystemGenerator != null)
             {
                 string lSystemString = "F"; // 例: 実際のL-System文字列をここに挿入
-                lSystemGenerator.GenerateTreeMesh(gameObject);
+                //lSystemGenerator.GenerateTreeMesh(gameObject);
                 yield return null; // 次のフレームまで待機してから次のオブジェクトに移る
             }
         }

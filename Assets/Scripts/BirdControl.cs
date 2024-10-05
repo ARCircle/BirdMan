@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // UIを使用するために必要
+using UnityEngine.UI;
 using System.Collections;
-using UnityEngine.Animations.Rigging;  // Chain IK Constraintが含まれている名前空間
+using UnityEngine.Animations.Rigging;
 
 [System.Serializable]
 public struct ObjectParameters
@@ -24,6 +24,7 @@ public struct ObjectParameters
     public float liftMultiplier;
     public float resistance;
 }
+
 public class BirdControl : MonoBehaviour
 {
     public GameObject Player;
@@ -31,8 +32,8 @@ public class BirdControl : MonoBehaviour
     public GameObject WingR;
     private float targetRotationZL = 0f;
     private float targetRotationZR = 0f;
-    public float rotationSpeed = 5f; // 回転速度を調整する
-    public Image ClickPositionImage; // 初期クリック地点を表示するイメージ
+    public float rotationSpeed = 5f;
+    public Image ClickPositionImage;
     bool isArmL;
     bool isArmR;
     Rigidbody rb;
@@ -42,29 +43,34 @@ public class BirdControl : MonoBehaviour
 
     private Vector2 initialClickPosition;
     private bool isDragging = false;
-  
-  
 
     public ObjectParameters bird;
     public ObjectParameters plane;
     Animator anime;
-    private void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-        ClickPositionImage.gameObject.SetActive(false); // 最初は非表示にしておく
-   anime=Player.GetComponent<Animator>();
-        // 現在のオブジェクトの初期X軸回転を保存
-        initialRotationX = Tail.transform.localEulerAngles.x;
-    }
 
     private float lastDragDistanceY;
     private float dragTimeCounter;
-    public float dragTimeThreshold = 0.5f; // 一定時間の閾値（秒）
-    public float oscillationSpeed = 1.0f; // 振動の速度
-    public float oscillationAmplitude = 5.0f; // 振動の振幅
+    public float dragTimeThreshold = 0.5f;
+    public float oscillationSpeed = 1.0f;
+    public float oscillationAmplitude = 5.0f;
     private float currentRotationValue = 0f;
     private float startTime;
     Vector2 dragDistance;
+
+    // 追加: 入力情報を保持する変数
+    private float inputDragX;
+    private float inputDragY;
+    private float inputRotationZL;
+    private float inputRotationZR;
+
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        ClickPositionImage.gameObject.SetActive(false);
+        anime = Player.GetComponent<Animator>();
+        initialRotationX = Tail.transform.localEulerAngles.x;
+    }
+
     void Update()
     {
         var pointer = Pointer.current;
@@ -89,9 +95,9 @@ public class BirdControl : MonoBehaviour
             {
                 dragTimeCounter = 0f;
                 lastDragDistanceY = dragDistance.y;
-                currentRotationValue = dragDistance.y * 0.1f; // 調整係数をかけて回転速度を調整
+                currentRotationValue = dragDistance.y * 0.1f;
 
-                startTime = 0f; // 振動をリセット
+                startTime = 0f;
             }
             else
             {
@@ -111,9 +117,9 @@ public class BirdControl : MonoBehaviour
             }
             else
             {
-                if (Mathf.Abs(dragDistance.y) > 1) // 上下方向へのドラッグ
+                if (Mathf.Abs(dragDistance.y) > 1)
                 {
-                    currentRotationValue = dragDistance.y * 0.1f; // 調整係数をかけて回転速度を調整
+                    currentRotationValue = dragDistance.y * 0.1f;
                     targetRotationZL = Mathf.Clamp(currentRotationValue, -20f, 20f);
                     isArmL = true;
                     targetRotationZR = Mathf.Clamp(currentRotationValue, -20f, 20f);
@@ -127,6 +133,12 @@ public class BirdControl : MonoBehaviour
                     isArmR = false;
                 }
             }
+
+            // 入力情報を保持
+            inputDragX = dragDistance.x;
+            inputDragY = dragDistance.y;
+            inputRotationZL = targetRotationZL;
+            inputRotationZR = targetRotationZR;
         }
         else
         {
@@ -135,7 +147,13 @@ public class BirdControl : MonoBehaviour
             targetRotationZR = 0f;
             isArmR = false;
             isDragging = false;
-            ClickPositionImage.gameObject.SetActive(false); // ドラッグ終了時に非表示にする
+            ClickPositionImage.gameObject.SetActive(false);
+
+            // 入力情報をリセット
+            inputDragX = 0f;
+            inputDragY = 0f;
+            inputRotationZL = 0f;
+            inputRotationZR = 0f;
         }
 
         // 翼の回転処理
@@ -145,11 +163,7 @@ public class BirdControl : MonoBehaviour
         newRotationZR = Mathf.MoveTowardsAngle(WingR.transform.eulerAngles.z, targetRotationZR, rotationSpeed * Time.deltaTime);
         WingR.transform.rotation = Quaternion.Euler(WingR.transform.eulerAngles.x, WingR.transform.eulerAngles.y, newRotationZR);
 
-        if (Player.name == "Bird")
-            Bird(newRotationZL, newRotationZR, dragDistance.x);
-        if (Player.name == "Plane")
-            Plane(dragDistance.x, dragDistance.y);
-
+        // アニメーション処理
         AngleText(newRotationZL, newRotationZR);
         Anime(newRotationZL, newRotationZR, dragDistance.x, dragDistance.y);
 
@@ -160,30 +174,35 @@ public class BirdControl : MonoBehaviour
         TailOscillator();
     }
 
-    public ChainIKConstraint chainIKR;  // Chain IK Constraintをアタッチする
-    public ChainIKConstraint chainIKL;  // Chain IK Constraintをアタッチする
-    public float frequency = 1.0f;     // 振動の周波数
-    public float amplitude = 0.5f;     // 振動の振幅
-    public float baseWeight = 0.5f;    // Weightの基本値
+    void FixedUpdate()
+    {
+        if (Player.name == "Bird")
+            Bird(inputRotationZL, inputRotationZR, inputDragX);
+        if (Player.name == "Plane")
+            Plane(inputDragX, inputDragY);
+    }
+
+    public ChainIKConstraint chainIKR;
+    public ChainIKConstraint chainIKL;
+    public float frequency = 1.0f;
+    public float amplitude = 0.5f;
+    public float baseWeight = 0.5f;
 
     public GameObject Tail;
-    public float frequencyTail = 1.0f;     // 振動の周波数
-    public float amplitudeTail = 30.0f;    // 振動の振幅 (度数)
-    private float initialRotationX;    // 初期のX軸回転を保存
+    public float frequencyTail = 1.0f;
+    public float amplitudeTail = 30.0f;
+    private float initialRotationX;
 
     void IKWeightOscillator()
     {
-       
-            // Weightを振動させる（正弦波で0〜1の範囲に変化）
-            float oscillation = amplitude * Mathf.Sin(Time.time * frequency * 2.0f * Mathf.PI);
-            chainIKR.weight = Mathf.Clamp(baseWeight + oscillation, 0.0f, 1.0f);  // 0〜1の範囲に制限
-            chainIKL.weight = Mathf.Clamp(baseWeight + oscillation, 0.0f, 1.0f);  // 0〜1の範囲に制限
-        
+        // Weightを振動させる（正弦波で0〜1の範囲に変化）
+        float oscillation = amplitude * Mathf.Sin(Time.time * frequency * 2.0f * Mathf.PI);
+        chainIKR.weight = Mathf.Clamp(baseWeight + oscillation, 0.0f, 1.0f);
+        chainIKL.weight = Mathf.Clamp(baseWeight + oscillation, 0.0f, 1.0f);
     }
 
-   
     public GameObject Hip;
-    public float hipRotationInfluence = 1.0f; // Hipの回転がTailのX軸回転に与える影響度
+    public float hipRotationInfluence = 1.0f;
 
     void TailOscillator()
     {
@@ -192,56 +211,41 @@ public class BirdControl : MonoBehaviour
 
         // HipのY軸の回転角度を取得（-180から180の範囲）
         float hipRotationY = Hip.transform.localEulerAngles.y;
-        if (hipRotationY > 180) hipRotationY -= 360;  // -180〜180に正規化
+        if (hipRotationY > 180) hipRotationY -= 360;
 
         // HipのY軸回転に応じたTailのX軸の追加回転量を計算
         float hipRotationEffect = hipRotationY * hipRotationInfluence;
 
         // Tailの回転を更新
         Vector3 newRotation = Tail.transform.localEulerAngles;
-        newRotation.x = initialRotationX + oscillation + hipRotationEffect;  // 初期回転 + 振動 + Hipの影響
-        Tail.transform.localEulerAngles = newRotation;  // 新しい回転を適用
+        newRotation.x = initialRotationX + oscillation + hipRotationEffect;
+        Tail.transform.localEulerAngles = newRotation;
     }
+
     private float previousRotationZL = 0f;
     private float previousRotationZR = 0f;
-    /*public float forceMultiplierUp = 1f;
-    public float forceMultiplierDown = 1f;
-    public float forceMultiplierLeft = 1f;
-    public float forceMultiplierFallDown = 1f;
-    public float maxForwardSpeed = 10f;
-    public float maxForwardFallSpeed = 100f;
-    public float forceMultiplierForward = 1f;
-    public float forceMultiplierFallForward = 1f;
-    public float forceMultiplierForwardStop = 1f;
-    public float forceMagnitudethreshold = 0.1f;
-    public float maxUpSpeed = 10f;
-    public float maxDownSpeed = -10f;
-    public float maxLift = 1f;
-    public float liftMultipler = 1f;
-    public float resistance = -1f;*/
-    
 
-    void Bird(float L, float R,float dragX)
+    void Bird(float L, float R, float dragX)
     {
-       
         float forwardSpeed = Vector3.Dot(rb.velocity, rb.transform.forward);
         if (R > 20)
             R = R - 360;
         if (L > 20)
             L = L - 360;
-        //rb.AddForce(Vector3.right * (L - R) * forceMultiplierLeft);
-        if(Mathf.Abs( dragX * 0.1f) >60f)
-            dragX = 600*Mathf.Sign(dragX);
-        rb.AddForce(Vector3.right * dragX*0.1f * bird.forceMultiplierLeft*Time.deltaTime);
+
+        // 左右への力の適用
+        if (Mathf.Abs(dragX * 0.1f) > 60f)
+            dragX = 600 * Mathf.Sign(dragX);
+        rb.AddForce(Vector3.right * dragX * 0.1f * bird.forceMultiplierLeft);
 
         if (forwardSpeed < bird.maxForwardSpeed)
         {
-            rb.AddForce(rb.transform.forward * bird.forceMultiplierForward * Time.deltaTime);
+            rb.AddForce(rb.transform.forward * bird.forceMultiplierForward);
         }
 
         if (isArmL || isArmR)
         {
-            rb.AddForce(rb.transform.up * bird.resistance * Time.deltaTime);
+            rb.AddForce(rb.transform.up * bird.resistance);
         }
 
         float upSpeed = Vector3.Dot(rb.velocity, rb.transform.up);
@@ -249,7 +253,7 @@ public class BirdControl : MonoBehaviour
 
         if (L > 0 || R > 0)
         {
-            rb.AddForce(Vector3.up * (L + R) * bird.forceMultiplierFallDown * Time.deltaTime);
+            rb.AddForce(Vector3.up * (L + R) * bird.forceMultiplierFallDown);
             if (forwardSpeed < bird.maxForwardFallSpeed)
             {
                 rb.AddForce(rb.transform.forward * bird.forceMultiplierFallForward);
@@ -258,21 +262,21 @@ public class BirdControl : MonoBehaviour
 
         if (L < 0 || R < 0)
         {
-            rb.AddForce(rb.transform.forward * bird.forceMultiplierForwardStop * Time.deltaTime);
+            rb.AddForce(rb.transform.forward * bird.forceMultiplierForwardStop);
         }
 
         if (forceMagnitude > bird.forceMagnitudeThreshold)
         {
             if (upSpeed < bird.maxUpSpeed)
             {
-                rb.AddForce(Vector3.up * forceMagnitude * bird.forceMultiplierUp * Time.deltaTime);
+                rb.AddForce(Vector3.up * forceMagnitude * bird.forceMultiplierUp);
             }
         }
         else if (forceMagnitude < -bird.forceMagnitudeThreshold)
         {
             if (upSpeed < bird.maxDownSpeed)
             {
-                rb.AddForce(Vector3.up * forceMagnitude * bird.forceMultiplierDown * Time.deltaTime);
+                rb.AddForce(Vector3.up * forceMagnitude * bird.forceMultiplierDown);
             }
         }
 
@@ -280,54 +284,42 @@ public class BirdControl : MonoBehaviour
         previousRotationZR = R;
     }
 
-    void Plane(float dragX ,float dragY)
+    void Plane(float dragX, float dragY)
     {
-        //print(Time.deltaTime+"  "+1/ Time.deltaTime);
-        //rb.AddForce(Vector3.right * (L - R) * forceMultiplierLeft);
         if (Mathf.Abs(dragX * 0.1f) > 60f)
             dragX = 60 * Mathf.Sign(dragX);
-        rb.AddForce(Vector3.right * dragX * 0.1f * plane.forceMultiplierLeft * Time.deltaTime);
+        rb.AddForce(Vector3.right * dragX * 0.1f * plane.forceMultiplierLeft);
 
         if (Mathf.Abs(dragY * 0.1f) > 60f)
             dragY = 60 * Mathf.Sign(dragY);
-        rb.AddForce(Vector3.up * dragY * 0.01f * plane.forceMultiplierUp * Time.deltaTime);
+        rb.AddForce(Vector3.up * dragY * 0.01f * plane.forceMultiplierUp);
 
         float forwardSpeed = Vector3.Dot(rb.velocity, rb.transform.forward);
-      
+
         if (forwardSpeed < plane.maxForwardSpeed)
         {
-            rb.AddForce(rb.transform.forward * plane.forceMultiplierForward * Time.deltaTime);
+            rb.AddForce(rb.transform.forward * plane.forceMultiplierForward);
         }
     }
 
     void AngleText(float L, float R)
     {
-       // AngleL.text = "" + L.ToString("F0");
-      //  if (L > 20)
-        //    AngleL.text = "" + (L - 360).ToString("F0");
-       // AngleR.text = "" + R.ToString("F0");
-       // if (R > 20)
-         //   AngleR.text = "" + (R - 360).ToString("F0");
+        // テキスト表示の処理（省略）
     }
 
-    
-    void Anime(float L, float R,float dragX, float dragY)
+    void Anime(float L, float R, float dragX, float dragY)
     {
         if (R > 20)
             R = R - 360;
         if (L > 20)
             L = L - 360;
 
-        if (Mathf.Abs(dragX * 0.1f) >60f)
+        if (Mathf.Abs(dragX * 0.1f) > 60f)
             dragX = 600 * Mathf.Sign(dragX);
         anime.SetFloat("Left", L / 20f);
         anime.SetFloat("Right", R / 20f);
         anime.SetFloat("Turn", dragX * 0.1f / 40f / 3f);
         anime.SetFloat("Pitch", dragY * 0.1f / 40f / 3f);
-        /*
-        anime.SetFloat("Left", L / 20f);
-        anime.SetFloat("Right", R / 20f);
-        anime.SetFloat("Turn", (L - R) / 40f / 3f);*/
     }
 
     public GameObject Hearts;
