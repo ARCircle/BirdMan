@@ -5,19 +5,21 @@ Shader "Custom/ToonOutlineShaderWithRange"
         _BaseColorHigh ("High Light Color", Color) = (1, 1, 1, 1)
         _BaseColorMid ("Mid Light Color", Color) = (0.5, 0.5, 0.5, 1)
         _BaseColorLow ("Low Light Color", Color) = (0.2, 0.2, 0.2, 1)
-        _High ("High", Float) = 0.6
-        _Low ("Low", Float) = 0.3
+        _High ("High Threshold", Range(0,1)) = 0.6
+        _Low ("Low Threshold", Range(0,1)) = 0.3
 
         _OutlineColor ("Outline Color", Color) = (0, 0, 0, 1)
         _OutlineWidth ("Outline Width", Float) = 0.05
-        _PlayerPosition ("Player Position", Vector) = (0, 0, 0, 0) // Playerのワールド座標
+
+        _PlayerPosition ("Player Position", Vector) = (0, 0, 0, 0) // プレイヤーのワールド座標
         _Range ("Display Range", Float) = 10.0 // 表示範囲
-        _UseRange ("Use Range Flag", Float) = 1.0 // 表示範囲制御を使うかどうかのフラグ（1:使う, 0:使わない）
+        _UseRange ("Use Range Flag", Float) = 1.0 // 範囲制限を使用するか（1: 使用, 0: 使用しない）
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
 
+        // メインのPass
         Pass
         {
             Name "Toon Pass"
@@ -27,7 +29,6 @@ Shader "Custom/ToonOutlineShaderWithRange"
             #pragma fragment frag
             #pragma target 3.0
 
-            // 必要なシェーダーライブラリをインクルード
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
 
@@ -58,12 +59,16 @@ Shader "Custom/ToonOutlineShaderWithRange"
             v2f vert(appdata v)
             {
                 v2f o;
+
                 // ワールド座標への変換
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
-                // クリップ座標への変換
-                o.pos = UnityObjectToClipPos(v.vertex);
+
                 // 法線をワールド座標系に変換
                 o.normal = normalize(mul((float3x3)unity_ObjectToWorld, v.normal));
+
+                // クリップ座標への変換
+                o.pos = UnityObjectToClipPos(v.vertex);
+
                 return o;
             }
 
@@ -85,11 +90,11 @@ Shader "Custom/ToonOutlineShaderWithRange"
                 if (_WorldSpaceLightPos0.w == 0.0)
                 {
                     // 平行光源の場合
-                    lightDir = normalize(_WorldSpaceLightPos0.xyz);
+                    lightDir = normalize(-_WorldSpaceLightPos0.xyz);
                 }
                 else
                 {
-                    // 点光源の場合（必要に応じて処理を追加）
+                    // 点光源の場合
                     lightDir = normalize(_WorldSpaceLightPos0.xyz - i.worldPos);
                 }
 
@@ -116,6 +121,7 @@ Shader "Custom/ToonOutlineShaderWithRange"
             ENDCG
         }
 
+        // アウトライン用のPass
         Pass
         {
             Name "Outline Pass"
@@ -143,22 +149,24 @@ Shader "Custom/ToonOutlineShaderWithRange"
 
             float4 _OutlineColor;
             float _OutlineWidth;
+
             float3 _PlayerPosition;
             float _Range;
             float _UseRange;
 
-            v2f vert(appdata v)
+            void vert(appdata v, out v2f o)
             {
-                v2f o;
                 // 法線をワールド座標系に変換
-                float3 normal = normalize(mul((float3x3)unity_ObjectToWorld, v.normal));
+                float3 normalWS = normalize(mul((float3x3)unity_ObjectToWorld, v.normal));
+
                 // 頂点を拡張してアウトラインを作成
-                float3 expandedVertex = v.vertex.xyz + normal * _OutlineWidth;
+                float3 expandedVertex = v.vertex.xyz + normalWS * _OutlineWidth;
+
                 // ワールド座標への変換
                 o.worldPos = mul(unity_ObjectToWorld, float4(expandedVertex, 1.0)).xyz;
+
                 // クリップ座標への変換
                 o.pos = UnityObjectToClipPos(float4(expandedVertex, 1.0));
-                return o;
             }
 
             fixed4 frag(v2f i) : SV_Target
