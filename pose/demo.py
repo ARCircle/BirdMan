@@ -159,7 +159,7 @@ def main(bodyinfo: BodyInfo):
             kpt_radius=1,
             boxes=False,
         )
-        # cv2.imshow('camImg', plot_img)
+        cv2.imshow('camImg', plot_img)
         
         if bodyinfo.body_tilt == None:
             tilt = 0
@@ -186,7 +186,7 @@ def main(bodyinfo: BodyInfo):
     return 0
 
 print("LOADING MODELS...")
-model = YOLO('yolov8n-pose')
+model = YOLO('yolo11n-pose')
 print("CONNECTING TO CAMERA...")
 cam = cv2.VideoCapture(0)
 
