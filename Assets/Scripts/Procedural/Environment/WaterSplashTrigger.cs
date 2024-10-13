@@ -14,6 +14,8 @@ public class WaterSplashRaycast : MonoBehaviour
     public GameObject FocusParticleObject;
     ParticleSystem FocusParticle;
     Rigidbody rb;
+    public BirdControl birdControl;
+    public GameObject InWaterPlane;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -29,6 +31,11 @@ public class WaterSplashRaycast : MonoBehaviour
             FocusParticle.Stop();
         }
 
+        if (birdControl.isSpeedUp)
+        {
+           
+            FocusParticle.Play();
+        }
         //if (FocusParticleObject.activeSelf == true)
         //   FocusParticleObject.SetActive(false);
         if (Player.transform.position.y < ground)
@@ -36,7 +43,14 @@ public class WaterSplashRaycast : MonoBehaviour
 
             if (rb.velocity.z > 0)
                 rb.AddForce(rb.transform.forward * speedDownMultiplier);
+            if(!InWaterPlane.activeSelf)
+                InWaterPlane.SetActive(true);
 
+        }
+        else
+        {
+            if (InWaterPlane.activeSelf)
+                InWaterPlane.SetActive(false);
         }
 
         // ���̈ʒu���牺������Ray�𓊂���
@@ -74,7 +88,8 @@ public class WaterSplashRaycast : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             Vector3 randomOffset = new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f));
-            Vector3 spawnPosition = hitPosition + randomOffset;
+           Vector3 hitToBird= new Vector3(0,0, birdTransform.position.y-hitPosition.y);
+            Vector3 spawnPosition = hitPosition + randomOffset+hitToBird ;
 
             // X����-90�x��]���ăp�[�e�B�N�����q�b�g�ʒu�ɐ���
             GameObject splash = Instantiate(waterSplashEffectPrefab, spawnPosition, Quaternion.Euler(-90, 0, 0));
@@ -92,12 +107,14 @@ public class WaterSplashRaycast : MonoBehaviour
           for (int i = 0; i < 3; i++)
             {
                 Vector3 randomOffset = new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f));
-                Vector3 spawnPosition = hitPosition + randomOffset;
+            Vector3 hitToBird = new Vector3(0, 0, birdTransform.position.y - hitPosition.y);
 
-            
-              
-                    // X����-90�x��]���ăp�[�e�B�N�����q�b�g�ʒu�ɐ���
-                      GameObject mapParticle = Instantiate(mapParticlePrefab, spawnPosition, Quaternion.Euler(-90, 0, 0));
+       Vector3 spawnPosition = hitPosition + randomOffset + hitToBird ;
+
+
+
+            // X����-90�x��]���ăp�[�e�B�N�����q�b�g�ʒu�ɐ���
+            GameObject mapParticle = Instantiate(mapParticlePrefab, spawnPosition, Quaternion.Euler(-90, 0, 0));
               
                 // �p�[�e�B�N����0.5�b��ɍ폜
                 Destroy(mapParticle, 0.5f);
@@ -112,7 +129,9 @@ public class WaterSplashRaycast : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             Vector3 randomOffset = new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f));
-            Vector3 spawnPosition = hitPosition + randomOffset;
+            Vector3 hitToBird = new Vector3(0, 0, birdTransform.position.y - hitPosition.y);
+
+            Vector3 spawnPosition = hitPosition + randomOffset+ hitToBird ;
 
 
 

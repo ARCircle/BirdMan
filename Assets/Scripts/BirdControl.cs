@@ -70,7 +70,11 @@ public class BirdControl : MonoBehaviour
         anime = Player.GetComponent<Animator>();
         initialRotationX = Tail.transform.localEulerAngles.x;
     }
+    public bool useSimulatedMouse = false; // 仮想マウス制御を使用するフラグ
+    private Vector2 simulatedMousePosition; // 仮想マウスの位置
 
+   
+    public AutoMouseControl autoMouseControl;
     void Update()
     {
         var pointer = Pointer.current;
@@ -79,8 +83,15 @@ public class BirdControl : MonoBehaviour
             // ディスプレイの中心点を初期クリック位置として設定
             initialClickPosition = new Vector2(Screen.width / 2, Screen.height / 2);
 
+
             // マウスの現在の位置を常に取得
             Vector2 currentPosition = pointer.position.ReadValue();
+            if (autoMouseControl.isSinusoidalControlEnabled)
+            {
+                // 仮想マウス位置を使用
+                currentPosition = autoMouseControl.simulatedMousePosition;
+            }
+           
             dragDistance = currentPosition - initialClickPosition;
 
             // 方向に応じた回転を計算
@@ -224,9 +235,10 @@ public class BirdControl : MonoBehaviour
 
     private float previousRotationZL = 0f;
     private float previousRotationZR = 0f;
-
+    public bool isSpeedUp;
     void Bird(float L, float R, float dragX)
     {
+      
         float forwardSpeed = Vector3.Dot(rb.velocity, rb.transform.forward);
         if (R > 20)
             R = R - 360;
@@ -254,15 +266,23 @@ public class BirdControl : MonoBehaviour
         if (L > 0 || R > 0)
         {
             rb.AddForce(Vector3.up * (L + R) * bird.forceMultiplierFallDown);
+            if (L > 5 || R > 5)
+                isSpeedUp = true;
+            else
+                isSpeedUp = false;
             if (forwardSpeed < bird.maxForwardFallSpeed)
             {
                 rb.AddForce(rb.transform.forward * bird.forceMultiplierFallForward);
+                
             }
         }
+     
+     
 
         if (L < 0 || R < 0)
         {
             rb.AddForce(rb.transform.forward * bird.forceMultiplierForwardStop);
+            
         }
 
         if (forceMagnitude > bird.forceMagnitudeThreshold)

@@ -118,7 +118,7 @@ Material:
     - _LowThreshold: 0.175
     - _Metallic: 0
     - _NoiseScale: 0.1
-    - _NoiseStrength: 1
+    - _NoiseStrength: 0.9
     - _OcclusionStrength: 1
     - _OutlineWidth: 0
     - _Parallax: 0.005

@@ -157,7 +157,7 @@ public class SpeedGraphWithShapes : MonoBehaviour
             currentFieldOfView = Mathf.Clamp(currentFieldOfView, minFieldOfView, maxFieldOfView);
 
             // ÉJÉÅÉâÇÃFOVÇ…ìKóp
-            mainCamera.fieldOfView = currentFieldOfView;
+            //mainCamera.fieldOfView = currentFieldOfView;
         }
     }
 
