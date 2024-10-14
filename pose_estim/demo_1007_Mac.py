@@ -10,7 +10,7 @@ from ultralytics.engine.results import Results
 from BodyInfo import BodyInfo
 
 STRIDE = 32
-SCALE = 6
+SCALE = 12
 IMG_H = STRIDE * int(SCALE / 4 * 3)
 IMG_W = STRIDE * SCALE
 
@@ -69,8 +69,8 @@ def main(bodyinfo: BodyInfo):
     # マウス移動が有効な場合のみ動かす
     if mouse_move_flag:
         pyautogui.moveTo(
-            2560 / 3 + tilt *0.9* MOUSE_MOVE_COEF_H,
-            1600 / 4 - angle *0.9* MOUSE_MOVE_COEF_V,
+            2560 / 3 + tilt * MOUSE_MOVE_COEF_H,
+            1600 / 4 - angle * MOUSE_MOVE_COEF_V,
             _pause=False,
         )
     if stop_flag:
