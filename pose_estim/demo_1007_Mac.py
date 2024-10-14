@@ -23,7 +23,7 @@ WINDOW_WIDTH = 1920
 # control flags
 stop_flag = False # キー入力を追跡するためのフラグ
 mouse_move_flag = True  # マウス移動のオン/オフを管理するフラグ
-imshow_flag = False # 推論結果の画像を表示するか否かを管理するフラグ
+imshow_flag = True # 推論結果の画像を表示するか否かを管理するフラグ
 
 # フレームキューの作成
 frame_queue = queue.Queue(maxsize=2)  # キューの最大サイズを設定してメモリを節約
