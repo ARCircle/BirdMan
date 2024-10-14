@@ -26,7 +26,7 @@ mouse_move_flag = True  # マウス移動のオン/オフを管理するフラ�
 imshow_flag = False # 推論結果の画像を表示するか否かを管理するフラグ
 
 # フレームキューの作成
-frame_queue = queue.Queue(maxsize=5)  # キューの最大サイズを設定してメモリを節約
+frame_queue = queue.Queue(maxsize=2)  # キューの最大サイズを設定してメモリを節約
 
 
 def async_camera_capture():
