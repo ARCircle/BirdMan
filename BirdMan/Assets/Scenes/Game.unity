@@ -12418,7 +12418,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &331143144
 RectTransform:
   m_ObjectHideFlags: 0
@@ -41939,7 +41939,7 @@ MonoBehaviour:
   radialSegments: 16
   tubularSegments: 32
   accelerator: {fileID: 2138327770}
-  acceleratorScale: 1.8
+  acceleratorScale: 3
 --- !u!23 &1450350300
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -57699,7 +57699,7 @@ MonoBehaviour:
     forceMultiplierUp: 150
     forceMultiplierDown: 500
     forceMultiplierLeft: 10
-    forceMultiplierFallDown: -50
+    forceMultiplierFallDown: -100
     maxForwardSpeed: 300
     maxForwardFallSpeed: 100
     forceMultiplierForward: 500

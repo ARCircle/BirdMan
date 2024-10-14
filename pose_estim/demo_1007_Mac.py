@@ -14,7 +14,7 @@ SCALE = 10
 IMG_H = STRIDE * int(SCALE / 4 * 3)
 IMG_W = STRIDE * SCALE
 
-CAM_DEVICE_ID = 1 # 1: outer webcam, 0: stock camera
+CAM_DEVICE_ID = 0 # 1: outer webcam, 0: stock camera
 
 MOUSE_MOVE_COEF_H = 1.2
 MOUSE_MOVE_COEF_V = 0.5

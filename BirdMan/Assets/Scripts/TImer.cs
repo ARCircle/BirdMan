@@ -92,7 +92,7 @@ public class Timer : MonoBehaviour
         lastDistanceText.text = distanceText.text;
         //= $"{currentZPosition:F0} m";
         autoMouseControl.isSinusoidalControlEnabled = true;
-        
+          audioSourceShining.Stop(); // 再生していない場合に再生
 
 
      }
