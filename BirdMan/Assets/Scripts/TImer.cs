@@ -9,6 +9,7 @@ public class Timer : MonoBehaviour
     public Text timerText;
     public Text distanceText;
     public Text lastDistanceText;
+    public Text clearDistanceText;
     public Text speedText;
     private float timer = 0f;
     public float clearTime = 10f; // 1��30�b = 90�b
@@ -66,6 +67,11 @@ public class Timer : MonoBehaviour
         ToTitle();
         //audioSourceWind1.PlayOneShot(soundWind1);
         audioSourceWind1.Play();
+        if (!audioSourceShining.isPlaying)
+            {
+                audioSourceShining.Play(); // 再生していない場合に再生
+                audioSourceShining.Stop(); // 再生していない場合に再生
+            }
     }
 
     void ToTitle()
@@ -138,14 +144,15 @@ public class Timer : MonoBehaviour
 
         TitleUI.SetActive(false);
         PracticeUI.SetActive(false);
-        GameUI.SetActive(true);
+        GameUI.SetActive(false);
         ClearUI.SetActive(true);
 
         isTitle = false;
         isPractice = false;
         isGame = false;
         isClear = true;
-
+        clearDistanceText.text = distanceText.text;
+       
         autoMouseControl.isSinusoidalControlEnabled = true;
 
     }
@@ -208,6 +215,22 @@ public class Timer : MonoBehaviour
             // �c�莞�Ԃ�0�����ɂȂ�Ȃ��悤�ɐ���
             remainingTime = Mathf.Max(remainingTime, 0f);
 
+               if (remainingTime <= 35.5f && remainingTime >= 10f)
+        {
+
+             if (!audioSourceShining.isPlaying)
+            {
+                audioSourceShining.Play(); // 再生していない場合に再生
+            }
+            // 35.5秒の時点で音量0, 10秒の時点で音量1にするための正規化
+            float normalizedTime = Mathf.InverseLerp(35.5f, 10f, remainingTime);
+
+            // 音量を指数的に増加させる（ここでは指数を2に設定、必要に応じて変更可能）
+            float exponentialVolume = Mathf.Pow(normalizedTime, 2f); // normalizedTime^2 で指数的な増加
+            audioSourceShining.volume = Mathf.Lerp(0f, 0.15f, exponentialVolume); // 0.3が最大音量
+
+           
+        }
             // ���ƕb�ɕϊ�
             float minutes = Mathf.FloorToInt(remainingTime / 60f);
             float seconds = Mathf.FloorToInt(remainingTime % 60f);
@@ -283,6 +306,7 @@ public class Timer : MonoBehaviour
 
 public AudioSource audioSourceWind1;
 public AudioSource audioSourceWind2;
+public AudioSource audioSourceShining;
 public AudioClip soundWind1;
 public AudioClip soundWind2;
 float pans;
