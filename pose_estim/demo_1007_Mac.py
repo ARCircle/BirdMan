@@ -69,6 +69,8 @@ def main(bodyinfo: BodyInfo):
 
     if len(result) == 0: # カメラを塞ぐとマウス操作が可能になる
         mouse_move_flag = False
+    else:
+        mouse_move_flag = True
     # マウス移動が有効な場合のみ動かす
     if mouse_move_flag:
         pyautogui.moveTo(
