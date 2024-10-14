@@ -150,9 +150,9 @@ Material:
     - _Color_1: {r: 0, g: 0.735849, b: 0.25005755, a: 0}
     - _Color_2: {r: 0, g: 0.6132076, b: 0.24581861, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _HighColor: {r: 1, g: 1, b: 1, a: 1}
-    - _LowColor: {r: 0.6, g: 0.9764706, b: 1, a: 1}
-    - _MidColor: {r: 0.5990566, g: 0.9778933, b: 1, a: 1}
+    - _HighColor: {r: 0.5754717, g: 0.5754717, b: 0.5754717, a: 1}
+    - _LowColor: {r: 0.40784314, g: 0.61960787, b: 0.6313726, a: 1}
+    - _MidColor: {r: 0.40846384, g: 0.6189218, b: 0.6320754, a: 1}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
     - _PlayerPosition: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}

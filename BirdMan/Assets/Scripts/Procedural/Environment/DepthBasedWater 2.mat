@@ -146,8 +146,8 @@ Material:
     - _Color_1: {r: 0.8207547, g: 0.72760725, b: 0.66202384, a: 0}
     - _Color_2: {r: 1, g: 0.94238544, b: 0.9103774, a: 0}
     - _DeepColor: {r: 0, g: 0.09999997, b: 0.29999998, a: 1}
-    - _DepthGradientDeep: {r: 1, g: 0, b: 0.8862745, a: 0.11372549}
-    - _DepthGradientShallow: {r: 0.4017415, g: 0, b: 1, a: 0.5882353}
+    - _DepthGradientDeep: {r: 1, g: 0, b: 0.9965396, a: 0.34117648}
+    - _DepthGradientShallow: {r: 0, g: 0.38120028, b: 1, a: 0.40392157}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShallowColor: {r: 0.39999998, g: 0.7, b: 0.9, a: 1}

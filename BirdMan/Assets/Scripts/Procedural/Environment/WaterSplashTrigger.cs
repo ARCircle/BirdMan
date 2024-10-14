@@ -20,7 +20,7 @@ public class WaterSplashRaycast : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         FocusParticle = FocusParticleObject.GetComponent<ParticleSystem>();
-
+  
     }
     void FixedUpdate()
     {
@@ -65,6 +65,13 @@ public class WaterSplashRaycast : MonoBehaviour
             // �q�b�g�����ʒu�ɐ��̃p�[�e�B�N���𐶐�
             SpawnWaterSplash(hit.point);
             speedUp();
+           
+            if (!audioSourceWater.isPlaying)
+{
+    audioSourceWater.PlayOneShot(soundWater1);
+     audioSourceWater.volume = 1.0f; // 音量を最大に設定
+}
+
         }
         // Map���C���[��Ray���q�b�g���������`�F�b�N
         else if (Physics.Raycast(ray, out hit, raycastDistance, mapLayerMask))
@@ -80,7 +87,24 @@ public class WaterSplashRaycast : MonoBehaviour
                 SpawnMapGroundParticle(hit.point);
             }
         }
+      
+else
+{
+
+    // 音量を徐々に減らす処理
+    if (audioSourceWater.volume > 0)
+    {
+        audioSourceWater.volume -= Time.deltaTime * 1f; // 徐々に音量を減らす
+        
+        if (audioSourceWater.volume < 0.1)
+        {
+            audioSourceWater.volume = 0; // マイナスにはならないようにする
+            audioSourceWater.Stop();
+        }
     }
+}
+    }
+    
 
     // �����Ԃ��̃p�[�e�B�N���𐶐�
     void SpawnWaterSplash(Vector3 hitPosition)
@@ -147,6 +171,14 @@ public class WaterSplashRaycast : MonoBehaviour
     public GameObject Player;
     public float forceMultiplierForward;
     public float speedDownMultiplier;
+
+public AudioClip soundWater1;
+
+public AudioClip sound3;
+public AudioClip sound4;
+
+public AudioSource audioSourceWater;
+
 
     public void speedUp()
     {

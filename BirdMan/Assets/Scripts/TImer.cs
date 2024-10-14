@@ -11,7 +11,7 @@ public class Timer : MonoBehaviour
     public Text lastDistanceText;
     public Text speedText;
     private float timer = 0f;
-    public float clearTime = 10f; // 1•ª30•b = 90•b
+    public float clearTime = 10f; // 1ï¿½ï¿½30ï¿½b = 90ï¿½b
     public BirdControl BirdControl;
     public GameObject LongHand;
     public GameObject ShortHand;
@@ -24,20 +24,20 @@ public class Timer : MonoBehaviour
     public GameObject ClearUI;
     public Camera mainCamera;
 
-    private float previousZPosition = 0f; // ‘O‰ñ‚ÌZˆÊ’u
-    private float cumulativeDistance = 0f; // —İŒv‹——£
-    private float elapsedTime = 0f; // Œo‰ßŠÔ‚Ìƒgƒ‰ƒbƒLƒ“ƒO
-    private bool isClear = false; // ƒQ[ƒ€ƒNƒŠƒA‚©‚Ç‚¤‚©‚ğ”»’è‚·‚éƒtƒ‰ƒO
+    private float previousZPosition = 0f; // ï¿½Oï¿½ï¿½ï¿½Zï¿½Ê’u
+    private float cumulativeDistance = 0f; // ï¿½İŒvï¿½ï¿½ï¿½ï¿½
+    private float elapsedTime = 0f; // ï¿½oï¿½ßï¿½ï¿½Ô‚Ìƒgï¿½ï¿½ï¿½bï¿½Lï¿½ï¿½ï¿½O
+    private bool isClear = false; // ï¿½Qï¿½[ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ğ”»’è‚·ï¿½ï¿½tï¿½ï¿½ï¿½O
     bool isGame;
     bool isTitle;
     bool isPractice;
     Rigidbody rb;
 
-    public float minFieldOfView = 60f; // Å¬Field of View
-    public float maxFieldOfView = 100f; // Å‘åField of View
-    public float fovChangeSpeedUp = 2f; // FOV‚Ì•Ï‰»‘¬“xiŠÔ‚ ‚½‚è‚Ì‘Œ¸—Êj
-    public float fovChangeSpeedDown = 2f; // FOV‚Ì•Ï‰»‘¬“xiŠÔ‚ ‚½‚è‚Ì‘Œ¸—Êj
-    private float currentFieldOfView; // Œ»İ‚ÌFOV
+    public float minFieldOfView = 60f; // ï¿½Åï¿½Field of View
+    public float maxFieldOfView = 100f; // ï¿½Å‘ï¿½Field of View
+    public float fovChangeSpeedUp = 2f; // FOVï¿½Ì•Ï‰ï¿½ï¿½ï¿½ï¿½xï¿½iï¿½ï¿½ï¿½Ô‚ï¿½ï¿½ï¿½ï¿½ï¿½Ì‘ï¿½ï¿½ï¿½ï¿½Êj
+    public float fovChangeSpeedDown = 2f; // FOVï¿½Ì•Ï‰ï¿½ï¿½ï¿½ï¿½xï¿½iï¿½ï¿½ï¿½Ô‚ï¿½ï¿½ï¿½ï¿½ï¿½Ì‘ï¿½ï¿½ï¿½ï¿½Êj
+    private float currentFieldOfView; // ï¿½ï¿½ï¿½İ‚ï¿½FOV
 
     public AutoMouseControl autoMouseControl;
 
@@ -45,11 +45,11 @@ public class Timer : MonoBehaviour
     {
       
 
-        // ‰æ–Ê‚Ì•‚ğ1920A‚‚³‚ğ1080AƒEƒBƒ“ƒhƒEƒ‚[ƒh‚Åİ’è‚·‚é
+        // ï¿½ï¿½Ê‚Ì•ï¿½ï¿½ï¿½1920ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1080ï¿½Aï¿½Eï¿½Bï¿½ï¿½ï¿½hï¿½Eï¿½ï¿½ï¿½[ï¿½hï¿½Åİ’è‚·ï¿½ï¿½
         Screen.SetResolution(640, 360, true);
-        // ƒtƒŒ[ƒ€ƒŒ[ƒg‚ğ60‚Éİ’è
+        // ï¿½tï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½gï¿½ï¿½60ï¿½Éİ’ï¿½
         Application.targetFrameRate = 25;
-        // ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ğ”ñ•\¦‚É‚µ‚ÄƒƒbƒN‚·‚é
+        // ï¿½}ï¿½Eï¿½Xï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½É‚ï¿½ï¿½Äƒï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½
         Cursor.visible = false;
 
      
@@ -61,9 +61,11 @@ public class Timer : MonoBehaviour
 
       
 
-        // ƒJƒƒ‰‚Ì‰ŠúFOV‚ğİ’è
+        // ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½FOVï¿½ï¿½İ’ï¿½
         currentFieldOfView = mainCamera.fieldOfView;
         ToTitle();
+        //audioSourceWind1.PlayOneShot(soundWind1);
+        audioSourceWind1.Play();
     }
 
     void ToTitle()
@@ -80,7 +82,7 @@ public class Timer : MonoBehaviour
         isClear = false;
 
 
-        // ‹——£‚Æ‘¬“x‚ğƒeƒLƒXƒg‚É•\¦
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Æ‘ï¿½ï¿½xï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½É•\ï¿½ï¿½
         lastDistanceText.text = distanceText.text;
         //= $"{currentZPosition:F0} m";
         autoMouseControl.isSinusoidalControlEnabled = true;
@@ -151,13 +153,13 @@ public class Timer : MonoBehaviour
     {
         var keyboard = Keyboard.current;
 
-        // CƒL[‚ÅƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹
+        // Cï¿½Lï¿½[ï¿½ÅƒAï¿½vï¿½ï¿½ï¿½Pï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½
         if (keyboard.cKey.wasPressedThisFrame)
         {
             QuitApplication();
         }
 
-        // RƒL[‚ÅƒV[ƒ“‚ğÄ“Ç‚İ‚İ
+        // Rï¿½Lï¿½[ï¿½ÅƒVï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Ä“Ç‚İï¿½ï¿½ï¿½
         if (keyboard.rKey.wasPressedThisFrame)
         {
             ReloadScene();
@@ -201,30 +203,30 @@ public class Timer : MonoBehaviour
         if (isGame)
             {
             timer += Time.deltaTime;
-            remainingTime = clearTime - timer; // c‚èŠÔ‚ÌŒvZ
+            remainingTime = clearTime - timer; // ï¿½cï¿½èï¿½Ô‚ÌŒvï¿½Z
 
-            // c‚èŠÔ‚ª0–¢–‚É‚È‚ç‚È‚¢‚æ‚¤‚É§ŒÀ
+            // ï¿½cï¿½èï¿½Ô‚ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½É‚È‚ï¿½È‚ï¿½ï¿½æ‚¤ï¿½Éï¿½ï¿½ï¿½
             remainingTime = Mathf.Max(remainingTime, 0f);
 
-            // •ª‚Æ•b‚É•ÏŠ·
+            // ï¿½ï¿½ï¿½Æ•bï¿½É•ÏŠï¿½
             float minutes = Mathf.FloorToInt(remainingTime / 60f);
             float seconds = Mathf.FloorToInt(remainingTime % 60f);
 
             TimerBack.GetComponent<Image>().fillAmount = remainingTime / clearTime;
 
-            // ƒ^ƒCƒ}[‚ğƒeƒLƒXƒg‚É•\¦ic‚èŠÔj
+            // ï¿½^ï¿½Cï¿½}ï¿½[ï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½É•\ï¿½ï¿½ï¿½iï¿½cï¿½èï¿½Ôj
             timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
 
-            // ‹——£‚Æ‘¬“x‚ÌŒvZ‚Æ•\¦
+            // ï¿½ï¿½ï¿½ï¿½ï¿½Æ‘ï¿½ï¿½xï¿½ÌŒvï¿½Zï¿½Æ•\ï¿½ï¿½
             UpdateDistanceAndSpeed();
             UpdateCameraFieldOfView();
 
-            // ŠÔ‚ª0‚É‚È‚Á‚½‚çƒNƒŠƒAUI‚ğ•\¦
+            // ï¿½ï¿½ï¿½Ô‚ï¿½0ï¿½É‚È‚ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½AUIï¿½ï¿½\ï¿½ï¿½
             if (remainingTime <= 0f && !isClear)
             {
                 ToClear();
               //  ClearUI.SetActive(true);
-              //  isClear = true; // ƒNƒŠƒAó‘Ô‚É•ÏX
+              //  isClear = true; // ï¿½Nï¿½ï¿½ï¿½Aï¿½ï¿½Ô‚É•ÏX
             }
 
         }
@@ -232,7 +234,7 @@ public class Timer : MonoBehaviour
             UpdateCameraFieldOfView0();
 
 
-        // ¶ƒNƒŠƒbƒN‚ª‰Ÿ‚³‚ê‚½‚çƒ^ƒCƒgƒ‹ƒV[ƒ“‚ÉˆÚ“®
+        // ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½^ï¿½Cï¿½gï¿½ï¿½ï¿½Vï¿½[ï¿½ï¿½ï¿½ÉˆÚ“ï¿½
         if (isClear && Mouse.current.leftButton.wasPressedThisFrame)
         {
             //ToTitle();
@@ -242,85 +244,147 @@ public class Timer : MonoBehaviour
 
 
 
-    // ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ğI—¹‚·‚éŠÖ”
+    // ï¿½Aï¿½vï¿½ï¿½ï¿½Pï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öï¿½
     void QuitApplication()
     {
 #if UNITY_EDITOR
-        // UnityƒGƒfƒBƒ^“à‚Å“®ì’†‚Ìê‡‚ÍƒGƒfƒBƒ^‚ğI—¹‚µ‚È‚¢
+        // Unityï¿½Gï¿½fï¿½Bï¿½^ï¿½ï¿½ï¿½Å“ï¿½ï¿½ì’†ï¿½Ìê‡ï¿½ÍƒGï¿½fï¿½Bï¿½^ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½
         UnityEditor.EditorApplication.isPlaying = false;
 #else
-            // ƒrƒ‹ƒh‚³‚ê‚½ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Å‚ÍI—¹‚·‚é
+            // ï¿½rï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ê‚½ï¿½Aï¿½vï¿½ï¿½ï¿½Pï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Å‚ÍIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             Application.Quit();
 #endif
     }
 
-    // Œ»İ‚ÌƒV[ƒ“‚ğÄ“Ç‚İ‚İ‚·‚éŠÖ”
+    // ï¿½ï¿½ï¿½İ‚ÌƒVï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Ä“Ç‚İï¿½ï¿½İ‚ï¿½ï¿½ï¿½Öï¿½
     void ReloadScene()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    // ‹——£‚Æ‘¬“x‚ÌXV
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Æ‘ï¿½ï¿½xï¿½ÌXï¿½V
     float startPosZ;
     void UpdateDistanceAndSpeed()
     {
         elapsedTime += Time.deltaTime;
 
-        // ˆê’èŠÔŠu‚²‚Æ‚É‹——£‚Æ‘¬“x‚ğXV
+        // ï¿½ï¿½ï¿½ÔŠuï¿½ï¿½ï¿½Æ‚É‹ï¿½ï¿½ï¿½ï¿½Æ‘ï¿½ï¿½xï¿½ï¿½ï¿½Xï¿½V
         if (elapsedTime >= 0.1f)
         {
-            elapsedTime = 0f; // ƒŠƒZƒbƒg
+            elapsedTime = 0f; // ï¿½ï¿½ï¿½Zï¿½bï¿½g
 
             float currentZPosition = BirdControl.transform.position.z- startPosZ;
 
-            // ‹——£‚Æ‘¬“x‚ğƒeƒLƒXƒg‚É•\¦
+            // ï¿½ï¿½ï¿½ï¿½ï¿½Æ‘ï¿½ï¿½xï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½gï¿½É•\ï¿½ï¿½
             distanceText.text = $"{currentZPosition:F0} m";
             speedText.text = $"{rb.velocity.z:F0} m/s";
         }
     }
 
-    // FOV‚ğ‘¬“x‚É‰‚¶‚ÄŠŠ‚ç‚©‚É•ÏX
+public AudioSource audioSourceWind1;
+public AudioSource audioSourceWind2;
+public AudioClip soundWind1;
+public AudioClip soundWind2;
+float pans;
+    // FOVï¿½ğ‘¬“xï¿½É‰ï¿½ï¿½ï¿½ï¿½ÄŠï¿½ï¿½ç‚©ï¿½É•ÏX
     void UpdateCameraFieldOfView()
     {
         float currentSpeed = rb.velocity.z;
 
-        // ‰Á‘¬‚µ‚Ä‚¢‚éê‡AFOV‚ğ‘‰Á
+
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ê‡ï¿½AFOVï¿½ğ‘‰ï¿½
         if (currentSpeed >= previousZPosition)
         {
             currentFieldOfView += fovChangeSpeedUp * Time.deltaTime;
         }
         else if (currentSpeed < previousZPosition)
         {
-            // Œ¸‘¬‚µ‚Ä‚¢‚éê‡AFOV‚ğŒ¸­
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ê‡ï¿½AFOVï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             currentFieldOfView -= fovChangeSpeedDown * Time.deltaTime;
         }
 
-        // FOV‚Ì”ÍˆÍ‚ğ§ŒÀ
-        currentFieldOfView = Mathf.Clamp(currentFieldOfView, minFieldOfView, maxFieldOfView);
+         /*
+    float middleFieldOfView= (minFieldOfView+maxFieldOfView)/2;
+    if( currentFieldOfView< middleFieldOfView ){
+         SEVolume(audioSourceWind1,soundWind1,true);
+         SEVolume(audioSourceWind2,soundWind2,false);
+ 
+    
+    }
+    else{
+         SEVolume(audioSourceWind1,soundWind1,false);
+         SEVolume(audioSourceWind2,soundWind2,true);
+       
+    }*/
 
-        // ƒJƒƒ‰‚ÌFOV‚É“K—p
+
+        // FOVï¿½Ì”ÍˆÍ‚ğ§Œï¿½
+        currentFieldOfView = Mathf.Clamp(currentFieldOfView, minFieldOfView, maxFieldOfView);
+ float FieldOfViewMul= currentFieldOfView/minFieldOfView;
+     audioSourceWind1.pitch = FieldOfViewMul*FieldOfViewMul*FieldOfViewMul+1f;
+     audioSourceWind1.volume= FieldOfViewMul*FieldOfViewMul-0.9f;
+     float panSpeed = 10f*FieldOfViewMul*FieldOfViewMul;
+    // pans+=panSpeed;
+      float panValue = Mathf.Sin(Time.time*panSpeed); // panSpeed ã¯å‹•ãã®é€Ÿã•
+      //audioSourceWind1.panStereo = panValue;
+        // ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½FOVï¿½É“Kï¿½p
         mainCamera.fieldOfView = currentFieldOfView;
 
-        // ‘O‰ñ‚Ì‘¬“x‚ğXV
+        // ï¿½Oï¿½ï¿½Ì‘ï¿½ï¿½xï¿½ï¿½ï¿½Xï¿½V
         previousZPosition = currentSpeed;
     }
+void SEVolume(AudioSource audioSource,AudioClip sound, bool up)
+{
+    if (!up)
+    {
+        // éŸ³é‡ã‚’ä¸‹ã’ã‚‹å‡¦ç†
+        if (audioSource.volume > 0)
+        {
+            audioSource.volume -= Time.deltaTime * 1f; // å¾ã€…ã«éŸ³é‡ã‚’æ¸›ã‚‰ã™
+
+            if (audioSource.volume < 0.1f)
+            {
+                audioSource.volume = 0; // ãƒã‚¤ãƒŠã‚¹ã«ã¯ãªã‚‰ãªã„ã‚ˆã†ã«ã™ã‚‹
+                audioSource.Stop(); // å®Œå…¨ã«éŸ³é‡ãŒä¸‹ãŒã£ãŸã‚‰åœæ­¢
+            }
+        }
+    }
+    else
+    {
+        // éŸ³é‡ã‚’ä¸Šã’ã‚‹å‡¦ç†
+        if (!audioSource.isPlaying)
+        {
+            audioSource.Play(); // å†ç”ŸãŒåœæ­¢ã—ã¦ã„ã‚‹å ´åˆã®ã¿å†ç”Ÿé–‹å§‹
+            audioSource.PlayOneShot(sound);
+            audioSource.volume = 1f; // éŸ³é‡ã®ä¸Šé™ã‚’ 1 ã«åˆ¶é™
+          
+        }
+
+        audioSource.volume += Time.deltaTime * 1f; // å¾ã€…ã«éŸ³é‡ã‚’ä¸Šã’ã‚‹
+
+        if (audioSource.volume > 1f)
+        {
+            audioSource.volume = 1f; // éŸ³é‡ã®ä¸Šé™ã‚’ 1 ã«åˆ¶é™
+        }
+    }
+}
 
     void UpdateCameraFieldOfView0()
     {
        if (100 < currentFieldOfView)
         {
-            // Œ¸‘¬‚µ‚Ä‚¢‚éê‡AFOV‚ğŒ¸­
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ê‡ï¿½AFOVï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             currentFieldOfView -= fovChangeSpeedDown * Time.deltaTime;
             mainCamera.fieldOfView = currentFieldOfView;
         }
 
-        // FOV‚Ì”ÍˆÍ‚ğ§ŒÀ
+        // FOVï¿½Ì”ÍˆÍ‚ğ§Œï¿½
        // currentFieldOfView = Mathf.Clamp(currentFieldOfView, minFieldOfView, maxFieldOfView);
 
-        // ƒJƒƒ‰‚ÌFOV‚É“K—p
+        // ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½FOVï¿½É“Kï¿½p
        
 
-        // ‘O‰ñ‚Ì‘¬“x‚ğXV
+        // ï¿½Oï¿½ï¿½Ì‘ï¿½ï¿½xï¿½ï¿½ï¿½Xï¿½V
         //previousZPosition = currentSpeed;
     }
 
