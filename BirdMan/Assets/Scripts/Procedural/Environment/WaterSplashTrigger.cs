@@ -22,6 +22,7 @@ public class WaterSplashRaycast : MonoBehaviour
         FocusParticle = FocusParticleObject.GetComponent<ParticleSystem>();
   
     }
+    bool firstDrop;
     void FixedUpdate()
     {
 
@@ -40,7 +41,15 @@ public class WaterSplashRaycast : MonoBehaviour
         //   FocusParticleObject.SetActive(false);
         if (Player.transform.position.y < ground)
         {
-
+//if(firstDrop){
+   if (!audioSourceDrop.isPlaying){
+audioSourceDrop.Play();
+ audioSourceDrop.volume = 0.5f; // マイナスにはならないようにする
+   }
+   if (audioSourceWind.isPlaying)
+audioSourceWind.Stop();
+//firstDrop=false;
+//}
             if (rb.velocity.z > 0)
                 rb.AddForce(rb.transform.forward * speedDownMultiplier);
             if(!InWaterPlane.activeSelf)
@@ -49,8 +58,24 @@ public class WaterSplashRaycast : MonoBehaviour
         }
         else
         {
+              if (!audioSourceWind.isPlaying)
+            audioSourceWind.Play();
             if (InWaterPlane.activeSelf)
                 InWaterPlane.SetActive(false);
+ if (audioSourceDrop.volume > 0)
+    {
+        audioSourceDrop.volume -= Time.deltaTime * 1f; // 徐々に音量を減らす
+        
+        if (audioSourceDrop.volume < 0.1)
+        {
+            audioSourceDrop.volume = 0; // マイナスにはならないようにする
+            audioSourceDrop.Stop();
+        }
+    }
+              //  if(!firstDrop){
+
+//firstDrop=true;
+//}
         }
 
         // ���̈ʒu���牺������Ray�𓊂���
@@ -68,27 +93,12 @@ public class WaterSplashRaycast : MonoBehaviour
            
             if (!audioSourceWater.isPlaying)
 {
-    audioSourceWater.PlayOneShot(soundWater1);
-     audioSourceWater.volume = 1.0f; // 音量を最大に設定
+    audioSourceWater.PlayOneShot(soundWater);
+     audioSourceWater.volume = 0.5f; // 音量を最大に設定
 }
 
         }
-        // Map���C���[��Ray���q�b�g���������`�F�b�N
-        else if (Physics.Raycast(ray, out hit, raycastDistance, mapLayerMask))
-        {
-            // �q�b�g�����ʒu��Map�̃p�[�e�B�N���𐶐�
-            if (hit.point.y > ground)
-            {
-                SpawnMapParticle(hit.point);
-                speedUp();
-            }
-            else
-            {
-                SpawnMapGroundParticle(hit.point);
-            }
-        }
-      
-else
+        else
 {
 
     // 音量を徐々に減らす処理
@@ -103,6 +113,43 @@ else
         }
     }
 }
+        // Map���C���[��Ray���q�b�g���������`�F�b�N
+        if (Physics.Raycast(ray, out hit, raycastDistance, mapLayerMask))
+        {
+            // �q�b�g�����ʒu��Map�̃p�[�e�B�N���𐶐�
+            if (hit.point.y > ground)
+            {
+                SpawnMapParticle(hit.point);
+                speedUp();
+                  if (!audioSourceGrass.isPlaying)
+{
+    audioSourceGrass.PlayOneShot(soundGrass);
+     audioSourceGrass.volume = 0.5f; // 音量を最大に設定
+}
+
+            }
+            else
+            {
+                SpawnMapGroundParticle(hit.point);
+            }
+        }
+        else
+{
+
+    // 音量を徐々に減らす処理
+    if (audioSourceGrass.volume > 0)
+    {
+        audioSourceGrass.volume -= Time.deltaTime * 1f; // 徐々に音量を減らす
+        
+        if (audioSourceGrass.volume < 0.1)
+        {
+            audioSourceGrass.volume = 0; // マイナスにはならないようにする
+            audioSourceGrass.Stop();
+        }
+    }
+}
+      
+
     }
     
 
@@ -172,12 +219,15 @@ else
     public float forceMultiplierForward;
     public float speedDownMultiplier;
 
-public AudioClip soundWater1;
+public AudioClip soundWater;
 
-public AudioClip sound3;
-public AudioClip sound4;
+public AudioClip soundGrass;
+public AudioClip soundDrop;
 
 public AudioSource audioSourceWater;
+public AudioSource audioSourceGrass;
+public AudioSource audioSourceDrop;
+public AudioSource audioSourceWind;
 
 
     public void speedUp()
