@@ -17,11 +17,11 @@ public class Timer : MonoBehaviour
     public GameObject LongHand;
     public GameObject ShortHand;
     public GameObject TimerBack;
-   
+
     public GameObject TitleUI;
     public GameObject PracticeUI;
     public GameObject GameUI;
-   
+
     public GameObject ClearUI;
     public Camera mainCamera;
 
@@ -44,7 +44,7 @@ public class Timer : MonoBehaviour
 
     void Awake()
     {
-      
+
 
         // ��ʂ̕���1920�A������1080�A�E�B���h�E���[�h�Őݒ肷��
         Screen.SetResolution(640, 360, true);
@@ -53,14 +53,14 @@ public class Timer : MonoBehaviour
         // �}�E�X�J�[�\�����\���ɂ��ă��b�N����
         Cursor.visible = false;
 
-     
+
     }
     void Start()
     {
         previousZPosition = BirdControl.transform.position.z;
         rb = BirdControl.GetComponent<Rigidbody>();
 
-      
+
 
         // �J�����̏���FOV��ݒ�
         currentFieldOfView = mainCamera.fieldOfView;
@@ -68,10 +68,10 @@ public class Timer : MonoBehaviour
         //audioSourceWind1.PlayOneShot(soundWind1);
         audioSourceWind1.Play();
         if (!audioSourceShining.isPlaying)
-            {
-                audioSourceShining.Play(); // 再生していない場合に再生
-                audioSourceShining.Stop(); // 再生していない場合に再生
-            }
+        {
+            audioSourceShining.Play(); // 再生していない場合に再生
+            audioSourceShining.Stop(); // 再生していない場合に再生
+        }
     }
 
     void ToTitle()
@@ -92,10 +92,10 @@ public class Timer : MonoBehaviour
         lastDistanceText.text = distanceText.text;
         //= $"{currentZPosition:F0} m";
         autoMouseControl.isSinusoidalControlEnabled = true;
-          audioSourceShining.Stop(); // 再生していない場合に再生
+        audioSourceShining.Stop(); // 再生していない場合に再生
 
 
-     }
+    }
 
     void ToPractice()
     {
@@ -134,7 +134,7 @@ public class Timer : MonoBehaviour
         isClear = false;
 
         autoMouseControl.isSinusoidalControlEnabled = false;
-        
+
 
 
     }
@@ -152,7 +152,7 @@ public class Timer : MonoBehaviour
         isGame = false;
         isClear = true;
         clearDistanceText.text = distanceText.text;
-       
+
         autoMouseControl.isSinusoidalControlEnabled = true;
 
     }
@@ -185,17 +185,19 @@ public class Timer : MonoBehaviour
             ToPractice();
         }
 
-       
+
+
         if (keyboard.gKey.wasPressedThisFrame)
         {
-            ToGame();
+            if (!isGame && !isClear)
+                ToGame();
         }
 
-        
+
 
     }
 
-    
+
 
     void Update()
     {
@@ -204,33 +206,33 @@ public class Timer : MonoBehaviour
         KeyInput();
 
 
-      
-        float remainingTime=0;
+
+        float remainingTime = 0;
         //if (!isClear&!isTitle)
         if (isGame)
-            {
+        {
             timer += Time.deltaTime;
             remainingTime = clearTime - timer; // �c�莞�Ԃ̌v�Z
 
             // �c�莞�Ԃ�0�����ɂȂ�Ȃ��悤�ɐ���
             remainingTime = Mathf.Max(remainingTime, 0f);
 
-               if (remainingTime <= 35.5f && remainingTime >= 10f)
-        {
-
-             if (!audioSourceShining.isPlaying)
+            if (remainingTime <= 35.5f && remainingTime >= 10f)
             {
-                audioSourceShining.Play(); // 再生していない場合に再生
+
+                if (!audioSourceShining.isPlaying)
+                {
+                    audioSourceShining.Play(); // 再生していない場合に再生
+                }
+                // 35.5秒の時点で音量0, 10秒の時点で音量1にするための正規化
+                float normalizedTime = Mathf.InverseLerp(35.5f, 10f, remainingTime);
+
+                // 音量を指数的に増加させる（ここでは指数を2に設定、必要に応じて変更可能）
+                float exponentialVolume = Mathf.Pow(normalizedTime, 2f); // normalizedTime^2 で指数的な増加
+                audioSourceShining.volume = Mathf.Lerp(0f, 0.15f, exponentialVolume); // 0.3が最大音量
+
+
             }
-            // 35.5秒の時点で音量0, 10秒の時点で音量1にするための正規化
-            float normalizedTime = Mathf.InverseLerp(35.5f, 10f, remainingTime);
-
-            // 音量を指数的に増加させる（ここでは指数を2に設定、必要に応じて変更可能）
-            float exponentialVolume = Mathf.Pow(normalizedTime, 2f); // normalizedTime^2 で指数的な増加
-            audioSourceShining.volume = Mathf.Lerp(0f, 0.15f, exponentialVolume); // 0.3が最大音量
-
-           
-        }
             // ���ƕb�ɕϊ�
             float minutes = Mathf.FloorToInt(remainingTime / 60f);
             float seconds = Mathf.FloorToInt(remainingTime % 60f);
@@ -248,8 +250,8 @@ public class Timer : MonoBehaviour
             if (remainingTime <= 0f && !isClear)
             {
                 ToClear();
-              //  ClearUI.SetActive(true);
-              //  isClear = true; // �N���A��ԂɕύX
+                //  ClearUI.SetActive(true);
+                //  isClear = true; // �N���A��ԂɕύX
             }
 
         }
@@ -296,7 +298,7 @@ public class Timer : MonoBehaviour
         {
             elapsedTime = 0f; // ���Z�b�g
 
-            float currentZPosition = BirdControl.transform.position.z- startPosZ;
+            float currentZPosition = BirdControl.transform.position.z - startPosZ;
 
             // �����Ƒ��x���e�L�X�g�ɕ\��
             distanceText.text = $"{currentZPosition:F0} m";
@@ -304,12 +306,12 @@ public class Timer : MonoBehaviour
         }
     }
 
-public AudioSource audioSourceWind1;
-public AudioSource audioSourceWind2;
-public AudioSource audioSourceShining;
-public AudioClip soundWind1;
-public AudioClip soundWind2;
-float pans;
+    public AudioSource audioSourceWind1;
+    public AudioSource audioSourceWind2;
+    public AudioSource audioSourceShining;
+    public AudioClip soundWind1;
+    public AudioClip soundWind2;
+    float pans;
     // FOV�𑬓x�ɉ����Ċ��炩�ɕύX
     void UpdateCameraFieldOfView()
     {
@@ -327,75 +329,75 @@ float pans;
             currentFieldOfView -= fovChangeSpeedDown * Time.deltaTime;
         }
 
-         /*
-    float middleFieldOfView= (minFieldOfView+maxFieldOfView)/2;
-    if( currentFieldOfView< middleFieldOfView ){
-         SEVolume(audioSourceWind1,soundWind1,true);
-         SEVolume(audioSourceWind2,soundWind2,false);
- 
-    
-    }
-    else{
-         SEVolume(audioSourceWind1,soundWind1,false);
-         SEVolume(audioSourceWind2,soundWind2,true);
-       
-    }*/
+        /*
+   float middleFieldOfView= (minFieldOfView+maxFieldOfView)/2;
+   if( currentFieldOfView< middleFieldOfView ){
+        SEVolume(audioSourceWind1,soundWind1,true);
+        SEVolume(audioSourceWind2,soundWind2,false);
+
+
+   }
+   else{
+        SEVolume(audioSourceWind1,soundWind1,false);
+        SEVolume(audioSourceWind2,soundWind2,true);
+
+   }*/
 
 
         // FOV�͈̔͂𐧌�
         currentFieldOfView = Mathf.Clamp(currentFieldOfView, minFieldOfView, maxFieldOfView);
- float FieldOfViewMul= currentFieldOfView/minFieldOfView;
-     audioSourceWind1.pitch = FieldOfViewMul*FieldOfViewMul*FieldOfViewMul+1f;
-     audioSourceWind1.volume= FieldOfViewMul*FieldOfViewMul-0.9f;
-     float panSpeed = 10f*FieldOfViewMul*FieldOfViewMul;
-    // pans+=panSpeed;
-      float panValue = Mathf.Sin(Time.time*panSpeed); // panSpeed は動きの速さ
-      //audioSourceWind1.panStereo = panValue;
-        // �J������FOV�ɓK�p
+        float FieldOfViewMul = currentFieldOfView / minFieldOfView;
+        audioSourceWind1.pitch = FieldOfViewMul * FieldOfViewMul * FieldOfViewMul + 1f;
+        audioSourceWind1.volume = FieldOfViewMul * FieldOfViewMul - 0.9f;
+        float panSpeed = 10f * FieldOfViewMul * FieldOfViewMul;
+        // pans+=panSpeed;
+        float panValue = Mathf.Sin(Time.time * panSpeed); // panSpeed は動きの速さ
+                                                          //audioSourceWind1.panStereo = panValue;
+                                                          // �J������FOV�ɓK�p
         mainCamera.fieldOfView = currentFieldOfView;
 
         // �O��̑��x���X�V
         previousZPosition = currentSpeed;
     }
-void SEVolume(AudioSource audioSource,AudioClip sound, bool up)
-{
-    if (!up)
+    void SEVolume(AudioSource audioSource, AudioClip sound, bool up)
     {
-        // 音量を下げる処理
-        if (audioSource.volume > 0)
+        if (!up)
         {
-            audioSource.volume -= Time.deltaTime * 1f; // 徐々に音量を減らす
-
-            if (audioSource.volume < 0.1f)
+            // 音量を下げる処理
+            if (audioSource.volume > 0)
             {
-                audioSource.volume = 0; // マイナスにはならないようにする
-                audioSource.Stop(); // 完全に音量が下がったら停止
+                audioSource.volume -= Time.deltaTime * 1f; // 徐々に音量を減らす
+
+                if (audioSource.volume < 0.1f)
+                {
+                    audioSource.volume = 0; // マイナスにはならないようにする
+                    audioSource.Stop(); // 完全に音量が下がったら停止
+                }
+            }
+        }
+        else
+        {
+            // 音量を上げる処理
+            if (!audioSource.isPlaying)
+            {
+                audioSource.Play(); // 再生が停止している場合のみ再生開始
+                audioSource.PlayOneShot(sound);
+                audioSource.volume = 1f; // 音量の上限を 1 に制限
+
+            }
+
+            audioSource.volume += Time.deltaTime * 1f; // 徐々に音量を上げる
+
+            if (audioSource.volume > 1f)
+            {
+                audioSource.volume = 1f; // 音量の上限を 1 に制限
             }
         }
     }
-    else
-    {
-        // 音量を上げる処理
-        if (!audioSource.isPlaying)
-        {
-            audioSource.Play(); // 再生が停止している場合のみ再生開始
-            audioSource.PlayOneShot(sound);
-            audioSource.volume = 1f; // 音量の上限を 1 に制限
-          
-        }
-
-        audioSource.volume += Time.deltaTime * 1f; // 徐々に音量を上げる
-
-        if (audioSource.volume > 1f)
-        {
-            audioSource.volume = 1f; // 音量の上限を 1 に制限
-        }
-    }
-}
 
     void UpdateCameraFieldOfView0()
     {
-       if (100 < currentFieldOfView)
+        if (100 < currentFieldOfView)
         {
             // �������Ă���ꍇ�AFOV������
             currentFieldOfView -= fovChangeSpeedDown * Time.deltaTime;
@@ -403,10 +405,10 @@ void SEVolume(AudioSource audioSource,AudioClip sound, bool up)
         }
 
         // FOV�͈̔͂𐧌�
-       // currentFieldOfView = Mathf.Clamp(currentFieldOfView, minFieldOfView, maxFieldOfView);
+        // currentFieldOfView = Mathf.Clamp(currentFieldOfView, minFieldOfView, maxFieldOfView);
 
         // �J������FOV�ɓK�p
-       
+
 
         // �O��̑��x���X�V
         //previousZPosition = currentSpeed;
